@@ -18,6 +18,22 @@
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 
 
+
+//OV2640的PWDN引脚接在PC2上
+void PC2_INIT_and_PWDN_ON(){
+	//初始化PC2
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+  GPIO_InitStruct.Pin = GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); 
+	
+	//输出0，来完成上电
+	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_2,GPIO_PIN_RESET);
+}
+
 //设置摄像头模块PWDN脚的状态
 //sta:0,PWDN=0,上电.
 //    1,PWDN=1,掉电
@@ -32,14 +48,8 @@ void OV2640_PWDN_Set(u8 sta)
 //       1,PWDN=1,掉电
 //使用IIC协议完成功能实现
 int  OV2640_PWDN_Set_Sxf(u8 status){
-	u8 data ;
-	data =      // 从OV2640中读出
-	if(data == ) {
-				//判断data是否读取正确，若错误输出提示符号，并结束函数运行
-		return  0;
-		} 
 	if(status == 0){
-				//进行上电位更新操作
+			PC2_INIT_and_PWDN_ON();	//进行上电位更新操作
 	}
 	else{
 				//进行下电位更新操作

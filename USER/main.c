@@ -49,19 +49,7 @@ volatile u8 jpeg_data_ok=0;				//JPEG数据采集完成标志
 										//1,数据采集完了,但是还没处理;
 										//2,数据已经处理完成了,可以开始下一帧接
 
-void PC2_INIT_and_PWDN_ON(){
-	//初始化PC2
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-  GPIO_InitStruct.Pin = GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); 
-	
-	//写出0电平
-	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_2,GPIO_PIN_RESET);
-}
+
 //处理JPEG数据
 //当采集完一帧JPEG数据后,调用此函数,切换JPEG BUF.开始下一帧采集.
 void jpeg_data_process(void)
