@@ -21,9 +21,31 @@
 //设置摄像头模块PWDN脚的状态
 //sta:0,PWDN=0,上电.
 //    1,PWDN=1,掉电
+//DCMI_OWDN_IO = 2,对应PCF8574的P2引脚
 void OV2640_PWDN_Set(u8 sta)
 {
 	PCF8574_WriteBit(DCMI_PWDN_IO,sta);
+}
+
+//设置摄像头模块PWDN脚状态
+//status:0,PWDN=0,上电
+//       1,PWDN=1,掉电
+//使用IIC协议完成功能实现
+int  OV2640_PWDN_Set_Sxf(u8 status){
+	u8 data ;
+	data =      // 从OV2640中读出
+	if(data == ) {
+				//判断data是否读取正确，若错误输出提示符号，并结束函数运行
+		return  0;
+		} 
+	if(status == 0){
+				//进行上电位更新操作
+	}
+	else{
+				//进行下电位更新操作
+	}
+				//写会OV2640
+	return 1;   //成功写会返回1
 }
 
 //初始化OV2640 
@@ -45,7 +67,12 @@ u8 OV2640_Init(void)
     HAL_GPIO_Init(GPIOA,&GPIO_Initure);     //初始化
  
     //PCF8574_Init();			//初始化PCF8574,没有就不用了
- 	OV2640_PWDN_Set(0);		//POWER ON;
+    OV2640_PWDN_Set(0);		//POWER ON;
+    if(OV2640_PWDN_Set_Sxf(0)==1){  //只需要给PWDN引脚低电平即可,可以不用IIC协议
+								//成功POWER ON
+    	}
+
+	
 	delay_ms(10);
 	OV2640_RST(0);	//复位OV2640
 	delay_ms(10);
