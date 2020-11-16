@@ -20,7 +20,7 @@
 
 
 //OV2640的PWDN引脚接在PC2上
-void PC2_INIT_and_PWDN_ON(){
+void PC2_INIT(){
 	//初始化PC2
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	__HAL_RCC_GPIOC_CLK_ENABLE();
@@ -28,12 +28,17 @@ void PC2_INIT_and_PWDN_ON(){
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); 
-	
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct); 	
+}
+
+void PC2_RESET(){	
 	//输出0，来完成上电
 	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_2,GPIO_PIN_RESET);
 }
 
+void PC2_SET(){	
+	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_2,GPIO_PIN_RESET);
+}
 //设置摄像头模块PWDN脚的状态
 //sta:0,PWDN=0,上电.
 //    1,PWDN=1,掉电
@@ -48,13 +53,13 @@ void OV2640_PWDN_Set(u8 sta)
 //       1,PWDN=1,掉电
 //使用IIC协议完成功能实现
 int  OV2640_PWDN_Set_Sxf(u8 status){
+	PC2_INIT();
 	if(status == 0){
-			PC2_INIT_and_PWDN_ON();	//进行上电位更新操作
+			PC2_RESET();	//进行上电位更新操作
 	}
 	else{
-				//进行下电位更新操作
+		PC2_SET();	//进行下电位更新操作
 	}
-				//写会OV2640
 	return 1;   //成功写会返回1
 }
 
@@ -77,23 +82,24 @@ u8 OV2640_Init(void)
     HAL_GPIO_Init(GPIOA,&GPIO_Initure);     //初始化
  
     //PCF8574_Init();			//初始化PCF8574,没有就不用了
-    OV2640_PWDN_Set(0);		//POWER ON;
+    //OV2640_PWDN_Set(0);		//POWER ON;
     if(OV2640_PWDN_Set_Sxf(0)==1){  //只需要给PWDN引脚低电平即可,可以不用IIC协议
 								//成功POWER ON
     	}
-
-	
 	delay_ms(10);
 	OV2640_RST(0);	//复位OV2640
 	delay_ms(10);
 	OV2640_RST(1);	//结束复位 
-    SCCB_Init();        		//初始化SCCB 的IO口	 
+			
+	//SCCB模拟操作，使用PB3作为SDA，PB4作为SCL
+  SCCB_Init();        		//初始化SCCB 的IO口	 
 	SCCB_WR_Reg(OV2640_DSP_RA_DLMT, 0x01);	//操作sensor寄存器
  	SCCB_WR_Reg(OV2640_SENSOR_COM7, 0x80);	//软复位OV2640
 	delay_ms(50); 
 	reg=SCCB_RD_Reg(OV2640_SENSOR_MIDH);	//读取厂家ID 高八位
 	reg<<=8;
 	reg|=SCCB_RD_Reg(OV2640_SENSOR_MIDL);	//读取厂家ID 低八位
+	printf("OV2640_MID = %d\r\n",reg);
 	if(reg!=OV2640_MID)
 	{
 		printf("MID:%d\r\n",reg);
@@ -102,6 +108,7 @@ u8 OV2640_Init(void)
 	reg=SCCB_RD_Reg(OV2640_SENSOR_PIDH);	//读取厂家ID 高八位
 	reg<<=8;
 	reg|=SCCB_RD_Reg(OV2640_SENSOR_PIDL);	//读取厂家ID 低八位
+	printf("OV2640_PID = %d\r\n",reg);
 	if(reg!=OV2640_PID)
 	{
 		printf("HID:%d\r\n",reg);

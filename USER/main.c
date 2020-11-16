@@ -246,7 +246,8 @@ u8 ov2640_jpg_photo(u8 *pname)
 
 int main(void)
 {
-	u8 res;							 
+	u8 res;					
+  u8 ov2640ret ;	
 	u8 *pname;					//带路径的文件名 
 	u8 key;						//键值		   
 	u8 i;						 
@@ -254,7 +255,6 @@ int main(void)
  	u8 scale=1;					//默认是全尺寸缩放
 	u8 msgbuf[15];				//消息缓存区 
 	u16 outputheight=0;
-	uint8_t init_str = 0xEE;   //初始化编码，01串口接收到表示运行
   Write_Through();                //开启强制透写！
   Cache_Enable();                 //打开L1-Cache,和cubemx生成相同
   MPU_Memory_Protection();        //保护相关存储区域
@@ -263,7 +263,8 @@ int main(void)
   delay_init(168);                //延时初始化
   uart1_init(115200);		        //串口1初始化
 	
-	HAL_UART_Transmit(&UART1_Handler,&init_str,1,1000);
+  //HAL_UART_Transmit(&UART1_Handler,&init_str,1,1000);
+  printf("usart init over\r\n");
   //send a character to know the status
 
   
@@ -272,7 +273,8 @@ int main(void)
   //KEY_Init();                     //初始化按键
   //SDRAM_Init();                   //SDRAM初始化,无SDRAM所以不初始化
   //LCD_Init();                     //LCD初始化
-  OV2640_Init();				    //初始化OV2640
+  ov2640ret = OV2640_Init();				    //初始化OV2640
+	printf("ov2640ret = %d\r\n",ov2640ret); //输出初始化OV2640后的返回值
   sw_sdcard_mode();			    //首先切换为SD卡模式
   PCF8574_Init();                 //初始化PCF8574
   W25QXX_Init();                  //初始化W25Q256

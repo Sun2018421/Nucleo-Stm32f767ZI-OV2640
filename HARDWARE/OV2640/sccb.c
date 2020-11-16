@@ -26,7 +26,7 @@ void SCCB_Init(void)
     GPIO_Initure.Pull=GPIO_PULLUP;          //上拉
     GPIO_Initure.Speed=GPIO_SPEED_FAST;     //快速
     HAL_GPIO_Init(GPIOB,&GPIO_Initure); 
-	SCCB_SDA_OUT();	   
+		SCCB_SDA_OUT();	   
 }			 
 
 //SCCB起始信号
