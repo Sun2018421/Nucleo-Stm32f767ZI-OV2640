@@ -268,27 +268,27 @@ int main(void)
   //send a character to know the status
 
   
-  usmart_dev.init(108); 		    //初始化USMART
+  //usmart_dev.init(108); 		    //初始化USMART，暂时未到调试阶段，所以注释掉
   //LED_Init();                     //初始化LED 
   //KEY_Init();                     //初始化按键
   //SDRAM_Init();                   //SDRAM初始化,无SDRAM所以不初始化
   //LCD_Init();                     //LCD初始化
   ov2640ret = OV2640_Init();				    //初始化OV2640
 	printf("ov2640ret = %d\r\n",ov2640ret); //输出初始化OV2640后的返回值
-  sw_sdcard_mode();			    //首先切换为SD卡模式
-  PCF8574_Init();                 //初始化PCF8574
-  W25QXX_Init();                  //初始化W25Q256
-  my_mem_init(SRAMIN);            //初始化内部内存池
-  my_mem_init(SRAMEX);            //初始化外部SDRAM内存池
-  my_mem_init(SRAMDTCM);           //初始化内部CCM内存池
-  POINT_COLOR=RED;  
-  exfuns_init();		            //为fatfs相关变量申请内存 
+  //sw_sdcard_mode();			    //首先切换为SD卡模式,因为无SD卡所以不初始化
+  //PCF8574_Init();                 //初始化PCF8574，因为无PCF8574所以不初始化
+  //W25QXX_Init();                  //初始化W25Q256，因为无W25Q256所以不初始化
+  //my_mem_init(SRAMIN);            //初始化内部内存池
+  //my_mem_init(SRAMEX);            //初始化外部SDRAM内存池
+  //my_mem_init(SRAMDTCM);           //初始化内部CCM内存池
+  //POINT_COLOR=RED;  
+  //exfuns_init();		            //为fatfs相关变量申请内存 
  
   
 	
-  f_mount(fs[0],"0:",1);          //挂载SD卡 
- 	f_mount(fs[1],"1:",1);          //挂载SPI FLASH. 
-	while(font_init()) 		        //检查字库
+  //f_mount(fs[0],"0:",1);          //挂载SD卡 
+ 	//f_mount(fs[1],"1:",1);          //挂载SPI FLASH. 
+	/*while(font_init()) 		        //检查字库
 	{	    
 		LCD_ShowString(30,50,200,16,16,"Font Error!");
 		delay_ms(200);				  
@@ -311,30 +311,30 @@ int main(void)
 		Show_Str(30,190,240,16,"拍照功能将不可用!",16,0);
 		delay_ms(200);				  
 		sd_ok=0;  	
-	}
+	}*/
 
 	//为jpeg和dma分配空间
-    dcmi_line_buf[0]=mymalloc(SRAMIN,jpeg_line_size*4);	//为jpeg dma接收申请内存	
-	dcmi_line_buf[1]=mymalloc(SRAMIN,jpeg_line_size*4);	//为jpeg dma接收申请内存	
-	jpeg_data_buf=mymalloc(SRAMEX,jpeg_buf_size);		//为jpeg文件申请内存(最大4MB)
+    //dcmi_line_buf[0]=mymalloc(SRAMIN,jpeg_line_size*4);	//为jpeg dma接收申请内存	
+	///dcmi_line_buf[1]=mymalloc(SRAMIN,jpeg_line_size*4);	//为jpeg dma接收申请内存	
+	///jpeg_data_buf=mymalloc(SRAMEX,jpeg_buf_size);		//为jpeg文件申请内存(最大4MB)
 
 	
- 	pname=mymalloc(SRAMIN,30);//为带路径的文件名分配30个字节的内存	 
- 	while(pname==NULL||!dcmi_line_buf[0]||!dcmi_line_buf[1]||!jpeg_data_buf)	//内存分配出错
- 	{	    
-		Show_Str(30,190,240,16,"内存分配失败!",16,0);
-		delay_ms(200);				  
-		LCD_Fill(30,190,240,146,WHITE);//清除显示	     
-		delay_ms(200);				  
-	}   
-	while(OV2640_Init())//初始化OV2640
-	{
-		Show_Str(30,190,240,16,"OV2640 错误!",16,0);
-		delay_ms(200);
-	    LCD_Fill(30,190,239,206,WHITE);
-		delay_ms(200);
-	}
-    Show_Str(30,210,230,16,"OV2640 正常",16,0); 
+ 	//pname=mymalloc(SRAMIN,30);//为带路径的文件名分配30个字节的内存	 
+ 	//while(pname==NULL||!dcmi_line_buf[0]||!dcmi_line_buf[1]||!jpeg_data_buf)	//内存分配出错
+ 	//{	    
+	//	Show_Str(30,190,240,16,"内存分配失败!",16,0);
+	//	delay_ms(200);				  
+	//	LCD_Fill(30,190,240,146,WHITE);//清除显示	     
+	//	delay_ms(200);				  
+	//}   
+	//while(OV2640_Init())//初始化OV2640
+	//{
+	//	Show_Str(30,190,240,16,"OV2640 错误!",16,0);
+	//	delay_ms(200);
+	//    LCD_Fill(30,190,239,206,WHITE);
+	//	delay_ms(200);
+	//}
+    //Show_Str(30,210,230,16,"OV2640 正常",16,0); 
 	//自动对焦初始化
 	OV2640_RGB565_Mode();	//RGB565模式 
 	OV2640_Light_Mode(0);	//自动模式
