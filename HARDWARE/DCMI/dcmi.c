@@ -77,9 +77,9 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* hdcmi)
     GPIO_Initure.Pin=GPIO_PIN_3; 
     HAL_GPIO_Init(GPIOD,&GPIO_Initure);         //初始化
     
-    //PH8
-    GPIO_Initure.Pin=GPIO_PIN_8; 
-    HAL_GPIO_Init(GPIOH,&GPIO_Initure);         //初始化   
+    //PH8-->PA4
+    GPIO_Initure.Pin=GPIO_PIN_4; 
+    HAL_GPIO_Init(GPIOA,&GPIO_Initure);         //初始化   
     
     HAL_NVIC_SetPriority(DCMI_IRQn,0,0);        //抢占优先级1，子优先级2
     HAL_NVIC_EnableIRQ(DCMI_IRQn);              //使能DCMI中断
