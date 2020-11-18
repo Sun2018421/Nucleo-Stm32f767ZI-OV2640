@@ -77,7 +77,7 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* hdcmi)
     GPIO_Initure.Pin=GPIO_PIN_3; 
     HAL_GPIO_Init(GPIOD,&GPIO_Initure);         //初始化
     
-    //PH8-->PA4
+    //PH8-->PA4,因为144封装没有PH8
     GPIO_Initure.Pin=GPIO_PIN_4; 
     HAL_GPIO_Init(GPIOA,&GPIO_Initure);         //初始化   
     
