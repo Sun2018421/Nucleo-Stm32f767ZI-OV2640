@@ -132,8 +132,8 @@ void DCMI_DMA_Init(u32 mem0addr,u32 mem1addr,u16 memsize,u32 memblen,u32 meminc)
 //DCMI,启动传输
 void DCMI_Start(void)
 {  
-    LCD_SetCursor(0,0);  
-	LCD_WriteRAM_Prepare();		        //开始写入GRAM
+    //LCD_SetCursor(0,0);  
+	//LCD_WriteRAM_Prepare();		        //开始写入GRAM
     __HAL_DMA_ENABLE(&DMADMCI_Handler); //使能DMA
     DCMI->CR|=DCMI_CR_CAPTURE;          //DCMI捕获使能
 }

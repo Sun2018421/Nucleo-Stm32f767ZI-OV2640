@@ -49,6 +49,9 @@ volatile u8 jpeg_data_ok=0;				//JPEG数据采集完成标志
 										//1,数据采集完了,但是还没处理;
 										//2,数据已经处理完成了,可以开始下一帧接
 
+void handle_dcmi_callback(void){
+	printf("i get picture\r\n");
+}
 
 //处理JPEG数据
 //当采集完一帧JPEG数据后,调用此函数,切换JPEG BUF.开始下一帧采集.
@@ -183,15 +186,17 @@ u8 ov2640_jpg_photo(u8 *pname)
 	u32 bwr;
 	u32 i,jpgstart,jpglen;
 	u8* pbuf;
-	f_jpg=(FIL *)mymalloc(SRAMIN,sizeof(FIL));	//开辟FIL字节的内存区域 
-	if(f_jpg==NULL)return 0XFF;				//内存申请失败.
+	printf("ov2640_jpg_photo\r\n");
+	//todo: 更新DMA以及文件缓冲大小，输出
+	//f_jpg=(FIL *)mymalloc(SRAMIN,sizeof(FIL));	//开辟FIL字节的内存区域 
+	//if(f_jpg==NULL)return 0XFF;				//内存申请失败.
 	ovx_mode=1;
 	jpeg_data_ok=0;
-	sw_ov2640_mode();						//切换为OV2640模式 
+	//sw_ov2640_mode();						//切换为OV2640模式 
 	OV2640_JPEG_Mode();						//JPEG模式  
 	OV2640_ImageWin_Set(0,0,1600,1200);			 
-	OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*120
-	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
+	OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
+	dcmi_rx_callback=handle_dcmi_callback;	//JPEG接收数据回调函数
 	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置    
 	DCMI_Start(); 			//启动传输 
 	while(jpeg_data_ok!=1);	//等待第一帧图片采集完
@@ -232,6 +237,7 @@ u8 ov2640_jpg_photo(u8 *pname)
 	f_close(f_jpg); 
 	sw_ov2640_mode();		//切换为OV2640模式
 	OV2640_RGB565_Mode();	//RGB565模式  
+	//dcmi_rx_callback = handle_dcmi_callback;
 	if(lcdltdc.pwidth!=0)	//RGB屏
 	{
 		dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
@@ -244,11 +250,15 @@ u8 ov2640_jpg_photo(u8 *pname)
 	return res;
 }  
 
+uint32_t JpegBuffer0[1024/4*80]; //80k的jpeg的缓冲内存0
+uint32_t JpegBuffer1[1024/4*80]; //80k的jpeg的缓冲内存1
+
 int main(void)
 {
+	
 	u8 res;					
   u8 ov2640ret ;	
-	u8 *pname;					//带路径的文件名 
+	u8 *pname ;					//带路径的文件名 
 	u8 key;						//键值		   
 	u8 i;						 
 	u8 sd_ok=1;					//0,sd卡不正常;1,SD卡正常. 
@@ -262,8 +272,6 @@ int main(void)
   SystemClock_Config();   //设置时钟,168Mhz 
   delay_init(168);                //延时初始化
   uart1_init(115200);		        //串口1初始化
-	
-  //HAL_UART_Transmit(&UART1_Handler,&init_str,1,1000);
   printf("usart init over\r\n");
   //send a character to know the status
 
@@ -336,20 +344,24 @@ int main(void)
 	//}
     //Show_Str(30,210,230,16,"OV2640 正常",16,0); 
 	//自动对焦初始化
-	OV2640_RGB565_Mode();	//RGB565模式 
+	//OV2640_RGB565_Mode();	//RGB565模式,切换为JPEG格式
+	OV2640_JPEG_Mode();
 	OV2640_Light_Mode(0);	//自动模式
 	OV2640_Color_Saturation(3);//色彩饱和度0
 	OV2640_Brightness(4);	//亮度0
 	OV2640_Contrast(3);		//对比度0
 	DCMI_Init();			//DCMI配置
-	if(lcdltdc.pwidth!=0)	//RGB屏
+	ov2640_jpg_photo(pname);
+	//dcmi_rx_callback =handle_dcmi_callback;
+	//DCMI_DMA_Init(JpegBuffer0,JpegBuffer1,
+	/*if(lcdltdc.pwidth!=0)	//RGB屏
 	{
-		dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
+		//dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
 		DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],lcddev.width/2,DMA_MDATAALIGN_HALFWORD,DMA_MINC_ENABLE);//DCMI DMA配置  
 	}else					//MCU 屏
 	{
 		DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,DMA_MDATAALIGN_HALFWORD,DMA_MINC_DISABLE);			//DCMI DMA配置,MCU屏,竖屏
-	}
+	}*/
     /*if(lcddev.height>800)
 	{
 		yoffset=(lcddev.height-800)/2;
@@ -364,6 +376,7 @@ int main(void)
 	curline=yoffset;		//行数复位
 	OV2640_OutSize_Set(lcddev.width,outputheight);	//满屏缩放显示
 	LCD_Clear(BLACK);*/
+
 	DCMI_Start(); 			//启动传输 
     while(1)
 	{	
