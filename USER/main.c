@@ -350,7 +350,7 @@ int main(void)
 	{
 		DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,DMA_MDATAALIGN_HALFWORD,DMA_MINC_DISABLE);			//DCMI DMA配置,MCU屏,竖屏
 	}
-    if(lcddev.height>800)
+    /*if(lcddev.height>800)
 	{
 		yoffset=(lcddev.height-800)/2;
 		outputheight=800; 
@@ -363,7 +363,7 @@ int main(void)
 	}
 	curline=yoffset;		//行数复位
 	OV2640_OutSize_Set(lcddev.width,outputheight);	//满屏缩放显示
-	LCD_Clear(BLACK);
+	LCD_Clear(BLACK);*/
 	DCMI_Start(); 			//启动传输 
     while(1)
 	{	
