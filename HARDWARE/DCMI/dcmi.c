@@ -156,6 +156,7 @@ void DCMI_IRQHandler(void)
 //hdcmi:DCMI句柄
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
+	printf("HAL_DCMI_FrameEventCallback_RUNING\r\n");
 	jpeg_data_process();//jpeg数据处理
 	LED1_Toggle;
 	ov_frame++; 

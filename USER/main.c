@@ -183,7 +183,7 @@ void camera_new_pathname(u8 *pname,u8 mode)
 //    其他,错误代码
 u8 ov2640_jpg_photo(u8 *pname)
 {
-	FIL* f_jpg; 
+	//FIL* f_jpg; 
 	u8 res=0,headok=0;
 	u32 bwr;
 	u32 i,jpgstart,jpglen;
@@ -206,7 +206,7 @@ u8 ov2640_jpg_photo(u8 *pname)
 	jpeg_data_ok=2;			//忽略本帧图片,启动下一帧采集 
 	while(jpeg_data_ok!=1);	//等待第二帧图片采集完,第二帧,才保存到SD卡去. 
 	DCMI_Stop(); 			//停止DMA搬运
-	ovx_mode=0; 
+	//ovx_mode=0; 
 	//sw_sdcard_mode();		//切换为SD卡模式
 	//res=f_open(f_jpg,(const TCHAR*)pname,FA_WRITE|FA_CREATE_NEW);//模式0,或者尝试打开失败,则创建新文件	 
 	if(res==0)
@@ -231,9 +231,9 @@ u8 ov2640_jpg_photo(u8 *pname)
 		if(jpglen)			//正常的jpeg数据 
 		{
 			pbuf+=jpgstart;	//偏移到0XFF,0XD8处
-			res=f_write(f_jpg,pbuf,jpglen,&bwr);
+			//res=f_write(f_jpg,pbuf,jpglen,&bwr);
 			if(bwr!=jpglen)res=0XFE; 
-			printf("get useful jpeg\r\n");
+			printf("get useful jpeg and the res = %x\r\n",res);
 		}else res=0XFD; 
 	}
 	/*jpeg_data_len=0;
@@ -356,7 +356,8 @@ int main(void)
 	OV2640_Brightness(4);	//亮度0
 	OV2640_Contrast(3);		//对比度0
 	DCMI_Init();			//DCMI配置
-	ov2640_jpg_photo(pname);  //内部有DMA初始化
+	res = ov2640_jpg_photo(pname);  //内部有DMA初始化
+	printf("OV2640_jpg_phote_ResValue = %x\r\n",res);
 	//dcmi_rx_callback =handle_dcmi_callback;
 	//DCMI_DMA_Init(JpegBuffer0,JpegBuffer1,
 	/*if(lcdltdc.pwidth!=0)	//RGB屏
