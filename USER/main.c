@@ -37,8 +37,8 @@ u8 ovx_mode=0;							//bit0:0,RGB565模式;1,JPEG模式
 u16 curline=0;							//摄像头输出数据,当前行编号
 u16 yoffset=0;							//y方向的偏移量
 
-#define jpeg_buf_size   4*1024*1024		//定义JPEG数据缓存jpeg_buf的大小(4M字节)
-#define jpeg_line_size	2*1024			//定义DMA接收数据时,一行数据的最大值
+#define jpeg_buf_size   24*1024		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->24K
+#define jpeg_line_size	2*1024			//定义DMA接收数据时,一行数据的最大值->2K
 
 u32 *dcmi_line_buf[2];					//RGB屏时,摄像头采用一行一行读取,定义行缓存  
 u32 *jpeg_data_buf;						//JPEG数据缓存buf 
@@ -48,6 +48,8 @@ volatile u8 jpeg_data_ok=0;				//JPEG数据采集完成标志
 										//0,数据没有采集完;
 										//1,数据采集完了,但是还没处理;
 										//2,数据已经处理完成了,可以开始下一帧接
+uint32_t JpegBuffer0[jpeg_buf_size/4]; //80k的jpeg的缓冲内存0
+uint32_t JpegBuffer1[jpeg_buf_size/4]; //80k的jpeg的缓冲内存1
 
 void handle_dcmi_callback(void){
 	printf("i get picture\r\n");
@@ -186,7 +188,6 @@ u8 ov2640_jpg_photo(u8 *pname)
 	u32 bwr;
 	u32 i,jpgstart,jpglen;
 	u8* pbuf;
-	printf("ov2640_jpg_photo\r\n");
 	//todo: 更新DMA以及文件缓冲大小，输出
 	//f_jpg=(FIL *)mymalloc(SRAMIN,sizeof(FIL));	//开辟FIL字节的内存区域 
 	//if(f_jpg==NULL)return 0XFF;				//内存申请失败.
@@ -194,9 +195,11 @@ u8 ov2640_jpg_photo(u8 *pname)
 	jpeg_data_ok=0;
 	//sw_ov2640_mode();						//切换为OV2640模式 
 	OV2640_JPEG_Mode();						//JPEG模式  
-	OV2640_ImageWin_Set(0,0,1600,1200);			 
-	OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
-	dcmi_rx_callback=handle_dcmi_callback;	//JPEG接收数据回调函数
+	res = OV2640_ImageWin_Set(0,0,1600,1200);
+	printf("OV2640_ImageWin_Set_RetValue: %d\r\n",res);
+	res = OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
+	printf("OV2640_OutSize_Set_RetValue: %d\r\n",res);
+	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
 	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置    
 	DCMI_Start(); 			//启动传输 
 	while(jpeg_data_ok!=1);	//等待第一帧图片采集完
@@ -204,8 +207,8 @@ u8 ov2640_jpg_photo(u8 *pname)
 	while(jpeg_data_ok!=1);	//等待第二帧图片采集完,第二帧,才保存到SD卡去. 
 	DCMI_Stop(); 			//停止DMA搬运
 	ovx_mode=0; 
-	sw_sdcard_mode();		//切换为SD卡模式
-	res=f_open(f_jpg,(const TCHAR*)pname,FA_WRITE|FA_CREATE_NEW);//模式0,或者尝试打开失败,则创建新文件	 
+	//sw_sdcard_mode();		//切换为SD卡模式
+	//res=f_open(f_jpg,(const TCHAR*)pname,FA_WRITE|FA_CREATE_NEW);//模式0,或者尝试打开失败,则创建新文件	 
 	if(res==0)
 	{
 		printf("jpeg data size:%d\r\n",jpeg_data_len*4);//串口打印JPEG文件大小
@@ -230,14 +233,14 @@ u8 ov2640_jpg_photo(u8 *pname)
 			pbuf+=jpgstart;	//偏移到0XFF,0XD8处
 			res=f_write(f_jpg,pbuf,jpglen,&bwr);
 			if(bwr!=jpglen)res=0XFE; 
-			
+			printf("get useful jpeg\r\n");
 		}else res=0XFD; 
 	}
-	jpeg_data_len=0;
-	f_close(f_jpg); 
-	sw_ov2640_mode();		//切换为OV2640模式
-	OV2640_RGB565_Mode();	//RGB565模式  
-	//dcmi_rx_callback = handle_dcmi_callback;
+	/*jpeg_data_len=0;
+	//f_close(f_jpg); 
+	//sw_ov2640_mode();		//切换为OV2640模式
+	//OV2640_RGB565_Mode();	//RGB565模式  
+	dcmi_rx_callback = handle_dcmi_callback;
 	if(lcdltdc.pwidth!=0)	//RGB屏
 	{
 		dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
@@ -246,18 +249,17 @@ u8 ov2640_jpg_photo(u8 *pname)
 	{
 		DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,1,0);			//DCMI DMA配置,MCU屏,竖屏
 	}
-	myfree(SRAMIN,f_jpg); 
+	myfree(SRAMIN,f_jpg); */
 	return res;
 }  
 
-uint32_t JpegBuffer0[1024/4*80]; //80k的jpeg的缓冲内存0
-uint32_t JpegBuffer1[1024/4*80]; //80k的jpeg的缓冲内存1
+
 
 int main(void)
 {
 	
 	u8 res;					
-  u8 ov2640ret ;	
+    u8 ov2640ret ;	
 	u8 *pname ;					//带路径的文件名 
 	u8 key;						//键值		   
 	u8 i;						 
@@ -265,6 +267,9 @@ int main(void)
  	u8 scale=1;					//默认是全尺寸缩放
 	u8 msgbuf[15];				//消息缓存区 
 	u16 outputheight=0;
+	dcmi_line_buf[0] = JpegBuffer0;
+	dcmi_line_buf[1] = JpegBuffer1;
+	
   Write_Through();                //开启强制透写！
   Cache_Enable();                 //打开L1-Cache,和cubemx生成相同
   MPU_Memory_Protection();        //保护相关存储区域
@@ -351,7 +356,7 @@ int main(void)
 	OV2640_Brightness(4);	//亮度0
 	OV2640_Contrast(3);		//对比度0
 	DCMI_Init();			//DCMI配置
-	ov2640_jpg_photo(pname);
+	ov2640_jpg_photo(pname);  //内部有DMA初始化
 	//dcmi_rx_callback =handle_dcmi_callback;
 	//DCMI_DMA_Init(JpegBuffer0,JpegBuffer1,
 	/*if(lcdltdc.pwidth!=0)	//RGB屏
