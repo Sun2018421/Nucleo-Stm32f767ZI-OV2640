@@ -37,7 +37,7 @@ u8 ovx_mode=0;							//bit0:0,RGB565模式;1,JPEG模式
 u16 curline=0;							//摄像头输出数据,当前行编号
 u16 yoffset=0;							//y方向的偏移量
 
-#define jpeg_buf_size   48*1024		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->24K
+#define jpeg_buf_size   48*1024		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->48K
 #define jpeg_line_size	2*1024			//定义DMA接收数据时,一行数据的最大值->2K
 
 u32 *dcmi_line_buf[2];					//RGB屏时,摄像头采用一行一行读取,定义行缓存  
@@ -60,6 +60,8 @@ void jpeg_data_process(void)
 	u16 rlen;			//剩余数据长度
 	u32 *pbuf;
 	curline=yoffset;	//行数复位
+	
+	printf("jpeg_data_process\r\n");
 	if(ovx_mode&0X01)	//只有在JPEG格式下,才需要做处理.
 	{
 		if(jpeg_data_ok==0)	//jpeg数据还未采集完?
@@ -94,10 +96,11 @@ void jpeg_data_process(void)
 
 //jpeg数据接收回调函数
 void jpeg_dcmi_rx_callback(void)
-{  
+{  	
 	u16 i;
 	u32 *pbuf;
 	pbuf=jpeg_data_buf+jpeg_data_len;//偏移到有效数据末尾
+    printf("jpeg_dcmi_rx_callback,data_len=%d\r\n",jpeg_data_len);
 	if(DMADMCI_Handler.Instance->CR&(1<<19))//buf0已满,正常处理buf1
 	{ 
 		for(i=0;i<jpeg_line_size;i++)pbuf[i]=dcmi_line_buf[0][i];//读取buf0里面的数据
@@ -193,7 +196,7 @@ u8 ov2640_jpg_photo(u8 *pname)
 	OV2640_JPEG_Mode();						//JPEG模式  
 	res = OV2640_ImageWin_Set(0,0,1600,1200);
 	printf("OV2640_ImageWin_Set_RetValue: %d\r\n",res);
-	res = OV2640_OutSize_Set(400,200);          //拍照尺寸为1600*1200->400*200
+	res = OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
 	printf("OV2640_OutSize_Set_RetValue: %d\r\n",res);
 	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
 	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置    
@@ -232,11 +235,11 @@ u8 ov2640_jpg_photo(u8 *pname)
 			printf("get useful jpeg and the res = %x\r\n",res);
 		}else res=0XFD; 
 	}
-	/*jpeg_data_len=0;
+	jpeg_data_len=0;
 	//f_close(f_jpg); 
 	//sw_ov2640_mode();		//切换为OV2640模式
 	//OV2640_RGB565_Mode();	//RGB565模式  
-	dcmi_rx_callback = handle_dcmi_callback;
+ /*	dcmi_rx_callback = handle_dcmi_callback;
 	if(lcdltdc.pwidth!=0)	//RGB屏
 	{
 		dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
@@ -253,16 +256,16 @@ u8 ov2640_jpg_photo(u8 *pname)
 
 int main(void)
 {
-	
+//	u8 key;						//键值		   
+//	u8 i;						 
+//	u8 sd_ok=1;					//0,sd卡不正常;1,SD卡正常. 
+//	u8 scale=1;					//默认是全尺寸缩放
+//	u8 msgbuf[15];				//消息缓存区 
+//  u16 outputheight=0;
 	u8 res;					
-    u8 ov2640ret ;	
+  u8 ov2640ret ;	
 	u8 *pname ;					//带路径的文件名 
-	u8 key;						//键值		   
-	u8 i;						 
-	u8 sd_ok=1;					//0,sd卡不正常;1,SD卡正常. 
- 	u8 scale=1;					//默认是全尺寸缩放
-	u8 msgbuf[15];				//消息缓存区 
-	u16 outputheight=0;
+
 	dcmi_line_buf[0] = JpegBuffer0;
 	dcmi_line_buf[1] = JpegBuffer1;
 	jpeg_data_buf = JpegBuf;

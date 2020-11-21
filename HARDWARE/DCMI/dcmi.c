@@ -159,7 +159,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
 	//printf("HAL_DCMI_FrameEventCallback_RUNING\r\n");
 	jpeg_data_process();//jpeg数据处理
-	LED1_Toggle;
+	//LED1_Toggle;
 	ov_frame++; 
     //重新使能帧中断,因为HAL_DCMI_IRQHandler()函数会关闭帧中断
     __HAL_DCMI_ENABLE_IT(&DCMI_Handler,DCMI_IT_FRAME);

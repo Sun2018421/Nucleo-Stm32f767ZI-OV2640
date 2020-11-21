@@ -80,10 +80,10 @@
 ..\obj\main.o: ..\SYSTEM\usart\usart.h
 ..\obj\main.o: ..\HARDWARE\LED\led.h
 ..\obj\main.o: ..\HARDWARE\KEY\key.h
+..\obj\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\string.h
+..\obj\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\main.o: ..\HARDWARE\OV2640\ov2640.h
 ..\obj\main.o: ..\HARDWARE\OV2640\sccb.h
 ..\obj\main.o: ..\HARDWARE\DCMI\dcmi.h
 ..\obj\main.o: ..\USMART\usmart.h
 ..\obj\main.o: ..\USMART\usmart_str.h
-..\obj\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\string.h
-..\obj\main.o: D:\keil5\ARM\ARMCC\Bin\..\include\math.h
