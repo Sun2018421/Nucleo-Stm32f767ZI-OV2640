@@ -33,6 +33,7 @@ void DCMI_Init(void)
     DCMI_Handler.Init.HSPolarity=DCMI_HSPOLARITY_LOW;       //HSYNC 低电平有效
     DCMI_Handler.Init.CaptureRate=DCMI_CR_ALL_FRAME;        //全帧捕获
     DCMI_Handler.Init.ExtendedDataMode=DCMI_EXTEND_DATA_8B; //8位数据格式 
+    DCMI_Handler.Init.JPEGMode = DCMI_JPEG_ENABLE;          //sxf-> 使能DCMI的JPEG格式
     HAL_DCMI_Init(&DCMI_Handler);                           //初始化DCMI 
     
      //关闭行中断、VSYNC中断、同步错误中断和溢出中断
@@ -156,7 +157,7 @@ void DCMI_IRQHandler(void)
 //hdcmi:DCMI句柄
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
-	printf("HAL_DCMI_FrameEventCallback_RUNING\r\n");
+	//printf("HAL_DCMI_FrameEventCallback_RUNING\r\n");
 	jpeg_data_process();//jpeg数据处理
 	LED1_Toggle;
 	ov_frame++; 
@@ -182,6 +183,7 @@ void DMA2_Stream1_IRQHandler(void)
 //width,height:LCD显示范围.
 void DCMI_Set_Window(u16 sx,u16 sy,u16 width,u16 height)
 {
+	/*
 	DCMI_Stop(); 
 	LCD_Clear(WHITE);
 	LCD_Set_Window(sx,sy,width,height);
@@ -189,7 +191,7 @@ void DCMI_Set_Window(u16 sx,u16 sy,u16 width,u16 height)
     LCD_SetCursor(0,0);  
 	LCD_WriteRAM_Prepare();		        //开始写入GRAM  
     __HAL_DMA_ENABLE(&DMADMCI_Handler); //开启DMA2,Stream1  
-    DCMI->CR|=DCMI_CR_CAPTURE;          //DCMI捕获使能	
+    DCMI->CR|=DCMI_CR_CAPTURE;          //DCMI捕获使能	*/
 }
    
 //通过usmart调试,辅助测试用.

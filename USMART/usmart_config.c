@@ -17,7 +17,7 @@ struct _m_usmart_nametab usmart_nametab[]=
 	(void*)read_addr,"u32 read_addr(u32 addr)",
 	(void*)write_addr,"void write_addr(u32 addr,u32 val)",	 
 #endif		   
-	(void*)bmp_encode,"u8 bmp_encode(u8 *filename,u16 x,u16 y,u16 width,u16 height,u8 mode)",
+	//(void*)bmp_encode,"u8 bmp_encode(u8 *filename,u16 x,u16 y,u16 width,u16 height,u8 mode)",
   (void*)SCCB_WR_Reg,"u8 SCCB_WR_Reg(u8 reg,u8 data)",
   (void*)SCCB_RD_Reg,"u8 SCCB_RD_Reg(u8 reg)",
 	(void*)DCMI_CR_Set,"void DCMI_CR_Set(u8 pclk,u8 hsync,u8 vsync)",

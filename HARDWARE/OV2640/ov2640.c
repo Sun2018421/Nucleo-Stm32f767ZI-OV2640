@@ -45,7 +45,7 @@ void PC2_SET(){
 //DCMI_OWDN_IO = 2,对应PCF8574的P2引脚
 void OV2640_PWDN_Set(u8 sta)
 {
-	PCF8574_WriteBit(DCMI_PWDN_IO,sta);
+	//PCF8574_WriteBit(DCMI_PWDN_IO,sta);
 }
 
 //设置摄像头模块PWDN脚状态

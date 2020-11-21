@@ -3,23 +3,23 @@
 #include "usart.h"
 #include "led.h"
 #include "key.h"
-#include "lcd.h"
-#include "ltdc.h"
-#include "sdram.h"
-#include "w25qxx.h"
-#include "nand.h"  
-#include "mpu.h"
+//#include "lcd.h"
+//#include "ltdc.h"
+//#include "sdram.h"
+//#include "w25qxx.h"
+//#include "nand.h"  
+//#include "mpu.h"
 #include "ov2640.h"
-#include "pcf8574.h"
+//#include "pcf8574.h"
 #include "dcmi.h"
-#include "sdmmc_sdcard.h"
+//#include "sdmmc_sdcard.h"
 #include "usmart.h"
-#include "malloc.h"
-#include "ff.h"
-#include "exfuns.h"
-#include "fontupd.h"
-#include "text.h"
-#include "piclib.h"	
+//#include "malloc.h"
+//#include "ff.h"
+//#include "exfuns.h"
+//#include "fontupd.h"
+//#include "text.h"
+//#include "piclib.h"	
 #include "string.h"		
 #include "math.h"
 /************************************************
@@ -37,7 +37,7 @@ u8 ovx_mode=0;							//bit0:0,RGB565模式;1,JPEG模式
 u16 curline=0;							//摄像头输出数据,当前行编号
 u16 yoffset=0;							//y方向的偏移量
 
-#define jpeg_buf_size   24*1024		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->24K
+#define jpeg_buf_size   48*1024		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->24K
 #define jpeg_line_size	2*1024			//定义DMA接收数据时,一行数据的最大值->2K
 
 u32 *dcmi_line_buf[2];					//RGB屏时,摄像头采用一行一行读取,定义行缓存  
@@ -48,12 +48,9 @@ volatile u8 jpeg_data_ok=0;				//JPEG数据采集完成标志
 										//0,数据没有采集完;
 										//1,数据采集完了,但是还没处理;
 										//2,数据已经处理完成了,可以开始下一帧接
-uint32_t JpegBuffer0[jpeg_buf_size/4]; //80k的jpeg的缓冲内存0
-uint32_t JpegBuffer1[jpeg_buf_size/4]; //80k的jpeg的缓冲内存1
-
-void handle_dcmi_callback(void){
-	printf("i get picture\r\n");
-}
+uint32_t JpegBuffer0[jpeg_line_size/4];  //2k的jpeg的缓冲内存0
+uint32_t JpegBuffer1[jpeg_line_size/4];  //2k的jpeg的缓冲内存1
+uint32_t JpegBuf[jpeg_buf_size/4];
 
 //处理JPEG数据
 //当采集完一帧JPEG数据后,调用此函数,切换JPEG BUF.开始下一帧采集.
@@ -90,8 +87,8 @@ void jpeg_data_process(void)
 			DCMI_Stop();	//停止DCMI
 			bmp_request=0;	//标记请求处理完成.
 		}
-		LCD_SetCursor(0,0);  
-		LCD_WriteRAM_Prepare();				//开始写入GRAM  
+//		LCD_SetCursor(0,0);  
+//		LCD_WriteRAM_Prepare();				//开始写入GRAM  
 	}  
 }
 
@@ -114,7 +111,7 @@ void jpeg_dcmi_rx_callback(void)
 }
 
 //RGB屏数据接收回调函数
-void rgblcd_dcmi_rx_callback(void)
+/*void rgblcd_dcmi_rx_callback(void)
 {  
 	u16 *pbuf;
 	if(DMADMCI_Handler.Instance->CR&(1<<19))//DMA使用buf1,读取buf0
@@ -131,8 +128,7 @@ void rgblcd_dcmi_rx_callback(void)
 		DCMI_Stop();	//停止DCMI
 		bmp_request=0;	//标记请求处理完成.
 	}
-}
-
+}*/
 //切换为OV2640模式
 void sw_ov2640_mode(void)
 {  
@@ -165,7 +161,7 @@ void sw_sdcard_mode(void)
 //mode:0,创建.bmp文件;1,创建.jpg文件.
 //bmp组合成:形如"0:PHOTO/PIC13141.bmp"的文件名
 //jpg组合成:形如"0:PHOTO/PIC13141.jpg"的文件名
-void camera_new_pathname(u8 *pname,u8 mode)
+/*void camera_new_pathname(u8 *pname,u8 mode)
 {	 
 	u8 res;					 
 	u16 index=0;
@@ -177,7 +173,7 @@ void camera_new_pathname(u8 *pname,u8 mode)
 		if(res==FR_NO_FILE)break;		//该文件名不存在=正是我们需要的.
 		index++;
 	}
-}  
+} */ 
 //OV5640拍照jpg图片
 //返回值:0,成功
 //    其他,错误代码
@@ -197,7 +193,7 @@ u8 ov2640_jpg_photo(u8 *pname)
 	OV2640_JPEG_Mode();						//JPEG模式  
 	res = OV2640_ImageWin_Set(0,0,1600,1200);
 	printf("OV2640_ImageWin_Set_RetValue: %d\r\n",res);
-	res = OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
+	res = OV2640_OutSize_Set(400,200);          //拍照尺寸为1600*1200->400*200
 	printf("OV2640_OutSize_Set_RetValue: %d\r\n",res);
 	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
 	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置    
@@ -269,10 +265,11 @@ int main(void)
 	u16 outputheight=0;
 	dcmi_line_buf[0] = JpegBuffer0;
 	dcmi_line_buf[1] = JpegBuffer1;
+	jpeg_data_buf = JpegBuf;
 	
   Write_Through();                //开启强制透写！
   Cache_Enable();                 //打开L1-Cache,和cubemx生成相同
-  MPU_Memory_Protection();        //保护相关存储区域
+  //MPU_Memory_Protection();        //保护相关存储区域
   HAL_Init();				        //初始化HAL库
   SystemClock_Config();   //设置时钟,168Mhz 
   delay_init(168);                //延时初始化
@@ -382,7 +379,7 @@ int main(void)
 	curline=yoffset;		//行数复位
 	OV2640_OutSize_Set(lcddev.width,outputheight);	//满屏缩放显示
 	LCD_Clear(BLACK);*/
-
+/*
 	DCMI_Start(); 			//启动传输 
     while(1)
 	{	
@@ -438,9 +435,9 @@ int main(void)
 					Show_Str(30,130,240,16,"拍照成功!",16,0);
 					Show_Str(30,150,240,16,"保存为:",16,0);
 					Show_Str(30+42,150,240,16,pname,16,0);		    
-					PCF8574_WriteBit(BEEP_IO,0);	//蜂鸣器短叫，提示拍照完成
+		//			PCF8574_WriteBit(BEEP_IO,0);	//蜂鸣器短叫，提示拍照完成
 					delay_ms(100);
-					PCF8574_WriteBit(BEEP_IO,1);	//关闭蜂鸣器
+		//			PCF8574_WriteBit(BEEP_IO,1);	//关闭蜂鸣器
 				}  
 				delay_ms(1000);		//等待1秒钟	
 				DCMI_Start();		//这里先使能dcmi,然后立即关闭DCMI,后面再开启DCMI,可以防止RGB屏的侧移问题.
@@ -460,6 +457,7 @@ int main(void)
 			LED0_Toggle;
  		}
 	}
+	*/
 }
 void HAL_MspInit(void)
 {

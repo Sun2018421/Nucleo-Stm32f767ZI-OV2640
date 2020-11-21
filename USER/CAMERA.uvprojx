@@ -594,74 +594,14 @@
               <FilePath>..\HARDWARE\KEY\key.c</FilePath>
             </File>
             <File>
-              <FileName>sdram.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SDRAM\sdram.c</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\LCD\lcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>ltdc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\LCD\ltdc.c</FilePath>
-            </File>
-            <File>
-              <FileName>ftl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\NAND\ftl.c</FilePath>
-            </File>
-            <File>
-              <FileName>nand.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\NAND\nand.c</FilePath>
-            </File>
-            <File>
-              <FileName>nandtester.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\NAND\nandtester.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdmmc_sdcard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SDMMC\sdmmc_sdcard.c</FilePath>
-            </File>
-            <File>
-              <FileName>w25qxx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\W25QXX\w25qxx.c</FilePath>
-            </File>
-            <File>
-              <FileName>qspi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\QSPI\qspi.c</FilePath>
-            </File>
-            <File>
               <FileName>dcmi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\DCMI\dcmi.c</FilePath>
             </File>
             <File>
-              <FileName>myiic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\IIC\myiic.c</FilePath>
-            </File>
-            <File>
-              <FileName>pcf8574.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\PCF8574\pcf8574.c</FilePath>
-            </File>
-            <File>
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\TIMER\timer.c</FilePath>
-            </File>
-            <File>
-              <FileName>mpu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\MPU\mpu.c</FilePath>
             </File>
             <File>
               <FileName>ov2640.c</FileName>
@@ -697,83 +637,15 @@
         </Group>
         <Group>
           <GroupName>MALLOC</GroupName>
-          <Files>
-            <File>
-              <FileName>malloc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MALLOC\malloc.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>FATFS</GroupName>
-          <Files>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FATFS\src\ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FATFS\src\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>exfuns.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FATFS\exfuns\exfuns.c</FilePath>
-            </File>
-            <File>
-              <FileName>fattester.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FATFS\exfuns\fattester.c</FilePath>
-            </File>
-            <File>
-              <FileName>mycc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FATFS\exfuns\mycc936.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>TEXT</GroupName>
-          <Files>
-            <File>
-              <FileName>text.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TEXT\text.c</FilePath>
-            </File>
-            <File>
-              <FileName>fontupd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\TEXT\fontupd.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>PICTURE</GroupName>
-          <Files>
-            <File>
-              <FileName>gif.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\PICTURE\gif.c</FilePath>
-            </File>
-            <File>
-              <FileName>bmp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\PICTURE\bmp.c</FilePath>
-            </File>
-            <File>
-              <FileName>piclib.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\PICTURE\piclib.c</FilePath>
-            </File>
-            <File>
-              <FileName>tjpgd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\PICTURE\tjpgd.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>README</GroupName>
