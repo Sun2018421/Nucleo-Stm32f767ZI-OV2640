@@ -133,7 +133,7 @@ void jpeg_dcmi_rx_callback(void)
 	}
 }*/
 //切换为OV2640模式
-void sw_ov2640_mode(void)
+/*void sw_ov2640_mode(void)
 {  
   GPIO_InitTypeDef GPIO_Initure;
  	OV2640_PWDN_Set(0); //OV2640 Power Up 
@@ -145,9 +145,9 @@ void sw_ov2640_mode(void)
   GPIO_Initure.Alternate=GPIO_AF13_DCMI;      //复用为DCMI   
   HAL_GPIO_Init(GPIOC,&GPIO_Initure);         //初始化 
 
-} 
+} */
 //切换为SD卡模式
-void sw_sdcard_mode(void)
+/*void sw_sdcard_mode(void)
 {
   GPIO_InitTypeDef GPIO_Initure;
 	OV2640_PWDN_Set(1); //OV2640 Power Down  
@@ -159,7 +159,7 @@ void sw_sdcard_mode(void)
   GPIO_Initure.Speed=GPIO_SPEED_HIGH;         //高速
   GPIO_Initure.Alternate=GPIO_AF12_SDMMC1;    //复用为SDIO  
   HAL_GPIO_Init(GPIOC,&GPIO_Initure);   
-}
+}*/
 //文件名自增（避免覆盖）
 //mode:0,创建.bmp文件;1,创建.jpg文件.
 //bmp组合成:形如"0:PHOTO/PIC13141.bmp"的文件名
@@ -252,7 +252,20 @@ u8 ov2640_jpg_photo(u8 *pname)
 	return res;
 }  
 
+void LEDinit(){
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	__HAL_RCC_GPIOB_CLK_ENABLE();               //使能GPIOB时钟
+	  /*Configure GPIO pins : PBPin PB7 */
+	GPIO_InitStruct.Pin = GPIO_PIN_7;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
 
+void LEDToggle(){
+	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_7);
+}
 
 int main(void)
 {
@@ -265,11 +278,11 @@ int main(void)
 	u8 res;					
   u8 ov2640ret ;	
 	u8 *pname ;					//带路径的文件名 
-
 	dcmi_line_buf[0] = JpegBuffer0;
 	dcmi_line_buf[1] = JpegBuffer1;
 	jpeg_data_buf = JpegBuf;
-	
+  LEDinit();
+  LEDToggle();
   Write_Through();                //开启强制透写！
   Cache_Enable();                 //打开L1-Cache,和cubemx生成相同
   //MPU_Memory_Protection();        //保护相关存储区域

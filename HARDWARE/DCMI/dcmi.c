@@ -22,6 +22,7 @@ DMA_HandleTypeDef   DMADMCI_Handler;        //DMA句柄
 
 u8 ov_frame=0;  						//帧率
 extern void jpeg_data_process(void);	//JPEG数据处理函数
+extern void LEDToggle(void);
 
 //DCMI初始化
 void DCMI_Init(void)
@@ -56,6 +57,7 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* hdcmi)
     __HAL_RCC_GPIOC_CLK_ENABLE();               //使能GPIOC时钟
     __HAL_RCC_GPIOD_CLK_ENABLE();               //使能GPIOD时钟
     __HAL_RCC_GPIOH_CLK_ENABLE();               //使能GPIOH时钟
+    __HAL_RCC_GPIOG_CLK_ENABLE();               //使能GPIOG时钟
     
     //初始化PA6
     GPIO_Initure.Pin=GPIO_PIN_6;  
@@ -64,9 +66,12 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* hdcmi)
     GPIO_Initure.Speed=GPIO_SPEED_HIGH;         //高速
     GPIO_Initure.Alternate=GPIO_AF13_DCMI;      //复用为DCMI   
     HAL_GPIO_Init(GPIOA,&GPIO_Initure);         //初始化
-    
-    //PB7,8,9
-    GPIO_Initure.Pin=GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9;  
+
+	//PG9 
+	GPIO_Initure.Pin=GPIO_PIN_9;
+	HAL_GPIO_Init(GPIOG,&GPIO_Initure);          //初始化PG9
+    //PB7,8,9- >不初始化PB7
+    GPIO_Initure.Pin=GPIO_PIN_8|GPIO_PIN_9;      //GPIO_PIN_7;  
     HAL_GPIO_Init(GPIOB,&GPIO_Initure);         //初始化
     
     //PC6,7,8,9,11
@@ -159,7 +164,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
 	//printf("HAL_DCMI_FrameEventCallback_RUNING\r\n");
 	jpeg_data_process();//jpeg数据处理
-	//LED1_Toggle;
+	LEDToggle(); //每次进入帧中断闪烁
 	ov_frame++; 
     //重新使能帧中断,因为HAL_DCMI_IRQHandler()函数会关闭帧中断
     __HAL_DCMI_ENABLE_IT(&DCMI_Handler,DCMI_IT_FRAME);
