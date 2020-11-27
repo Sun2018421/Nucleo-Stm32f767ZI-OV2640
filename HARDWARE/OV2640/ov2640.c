@@ -99,7 +99,7 @@ u8 OV2640_Init(void)
 	reg=SCCB_RD_Reg(OV2640_SENSOR_MIDH);	//读取厂家ID 高八位
 	reg<<=8;
 	reg|=SCCB_RD_Reg(OV2640_SENSOR_MIDL);	//读取厂家ID 低八位
-	printf("OV2640_MID = %d\r\n",reg);
+	//printf("OV2640_MID = %d\r\n",reg);
 	if(reg!=OV2640_MID)
 	{
 		printf("MID:%d\r\n",reg);
@@ -108,7 +108,7 @@ u8 OV2640_Init(void)
 	reg=SCCB_RD_Reg(OV2640_SENSOR_PIDH);	//读取厂家ID 高八位
 	reg<<=8;
 	reg|=SCCB_RD_Reg(OV2640_SENSOR_PIDL);	//读取厂家ID 低八位
-	printf("OV2640_PID = %d\r\n",reg);
+	//printf("OV2640_PID = %d\r\n",reg);
 	if(reg!=OV2640_PID)
 	{
 		printf("HID:%d\r\n",reg);

@@ -22,7 +22,9 @@ DMA_HandleTypeDef   DMADMCI_Handler;        //DMA句柄
 
 u8 ov_frame=0;  						//帧率
 extern void jpeg_data_process(void);	//JPEG数据处理函数
-extern void LEDToggle(void);
+extern void BLUELEDToggle(void); //Blue led toggle
+extern void REDLEDToggle(void);   //Red led toggle
+extern volatile u8 jpeg_data_ok;
 
 //DCMI初始化
 void DCMI_Init(void)
@@ -163,8 +165,9 @@ void DCMI_IRQHandler(void)
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
 	//printf("HAL_DCMI_FrameEventCallback_RUNING\r\n");
+	BLUELEDToggle();
+	//每次进入帧中断闪烁
 	jpeg_data_process();//jpeg数据处理
-	LEDToggle(); //每次进入帧中断闪烁
 	ov_frame++; 
     //重新使能帧中断,因为HAL_DCMI_IRQHandler()函数会关闭帧中断
     __HAL_DCMI_ENABLE_IT(&DCMI_Handler,DCMI_IT_FRAME);
@@ -173,7 +176,8 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 void (*dcmi_rx_callback)(void);//DCMI DMA接收回调函数
 //DMA2数据流1中断服务函数
 void DMA2_Stream1_IRQHandler(void)
-{
+{ 
+		REDLEDToggle();
     if(__HAL_DMA_GET_FLAG(&DMADMCI_Handler,DMA_FLAG_TCIF1_5)!=RESET)//DMA传输完成
     {
         __HAL_DMA_CLEAR_FLAG(&DMADMCI_Handler,DMA_FLAG_TCIF1_5);//清除DMA传输完成中断标志位
