@@ -165,7 +165,7 @@ void DCMI_IRQHandler(void)
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi)
 {
 	//printf("HAL_DCMI_FrameEventCallback_RUNING\r\n");
-	BLUELEDToggle();
+	//BLUELEDToggle();
 	//每次进入帧中断闪烁
 	jpeg_data_process();//jpeg数据处理
 	ov_frame++; 
@@ -177,7 +177,7 @@ void (*dcmi_rx_callback)(void);//DCMI DMA接收回调函数
 //DMA2数据流1中断服务函数
 void DMA2_Stream1_IRQHandler(void)
 { 
-		REDLEDToggle();
+		//REDLEDToggle();
     if(__HAL_DMA_GET_FLAG(&DMADMCI_Handler,DMA_FLAG_TCIF1_5)!=RESET)//DMA传输完成
     {
         __HAL_DMA_CLEAR_FLAG(&DMADMCI_Handler,DMA_FLAG_TCIF1_5);//清除DMA传输完成中断标志位

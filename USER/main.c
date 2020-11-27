@@ -51,7 +51,8 @@ volatile u8 jpeg_data_ok=0;				//JPEG数据采集完成标志
 uint32_t JpegBuffer0[jpeg_line_size/4];  //2k的jpeg的缓冲内存0
 uint32_t JpegBuffer1[jpeg_line_size/4];  //2k的jpeg的缓冲内存1
 uint32_t JpegBuf[jpeg_buf_size/4];
-
+void REDLEDToggle(void);
+void BLUELEDToggle(void);
 //处理JPEG数据
 //当采集完一帧JPEG数据后,调用此函数,切换JPEG BUF.开始下一帧采集.
 void jpeg_data_process(void)
@@ -59,6 +60,7 @@ void jpeg_data_process(void)
 	u16 i;
 	u16 rlen;			//剩余数据长度
 	u32 *pbuf;
+	BLUELEDToggle();
 	curline=yoffset;	//行数复位
 	if(ovx_mode&0X01)	//只有在JPEG格式下,才需要做处理.
 	{
@@ -90,6 +92,7 @@ void jpeg_dcmi_rx_callback(void)
 {  	
 	u16 i;
 	u32 *pbuf;
+	REDLEDToggle();
 	pbuf=jpeg_data_buf+jpeg_data_len;//偏移到有效数据末尾
   //  printf("jpeg_dcmi_rx_callback,data_len=%d\r\n",jpeg_data_len);
 	if(DMADMCI_Handler.Instance->CR&(1<<19))//buf0已满,正常处理buf1
@@ -246,12 +249,10 @@ int main(void)
 	//LEDtest();
 	//printf("usart init over\r\n");
   //send a character to know the status
-  ov2640ret = OV2640_Init();				    //初始化OV2640
-	if(ov2640ret==0){
-		BLUELEDToggle();
-		HAL_Delay(500);
-		BLUELEDToggle();
-	}
+  while(OV2640_Init()!=0);				    //初始化OV2640
+	BLUELEDToggle();
+	HAL_Delay(500);
+	BLUELEDToggle();
 	//printf("ov2640ret = %d\r\n",ov2640ret); //输出初始化OV2640后的返回值
     //Show_Str(30,210,230,16,"OV2640 正常",16,0); 
 	//自动对焦初始化
