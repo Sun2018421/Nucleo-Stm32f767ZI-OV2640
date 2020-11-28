@@ -33,7 +33,7 @@
 ************************************************/
 
 vu8 bmp_request=0;						//bmp拍照请求:0,无bmp拍照请求;1,有bmp拍照请求,需要在帧中断里面,关闭DCMI接口.
-u8 ovx_mode=0;							//bit0:0,RGB565模式;1,JPEG模式 
+u8 ovx_mode=1;							//bit0:0,RGB565模式;1,JPEG模式 
 u16 curline=0;							//摄像头输出数据,当前行编号
 u16 yoffset=0;							//y方向的偏移量
 
@@ -64,6 +64,7 @@ void jpeg_data_process(void)
 	curline=yoffset;	//行数复位
 	if(ovx_mode&0X01)	//只有在JPEG格式下,才需要做处理.
 	{
+		printf("jpeg_data_ok is %d\r\n",jpeg_data_ok);
 		if(jpeg_data_ok==0)	//jpeg数据还未采集完?
 		{
             __HAL_DMA_DISABLE(&DMADMCI_Handler);//关闭DMA
@@ -73,6 +74,7 @@ void jpeg_data_process(void)
 			if(DMADMCI_Handler.Instance->CR&(1<<19))for(i=0;i<rlen;i++)pbuf[i]=dcmi_line_buf[1][i];//读取buf1里面的剩余数据
 			else for(i=0;i<rlen;i++)pbuf[i]=dcmi_line_buf[0][i];//读取buf0里面的剩余数据 
 			jpeg_data_len+=rlen;			//加上剩余长度
+			
 			jpeg_data_ok=1; 				//标记JPEG数据采集完按成,等待其他函数处理
 		}
 		if(jpeg_data_ok==2)	//上一次的jpeg数据已经被处理了
@@ -130,17 +132,24 @@ u8 ov2640_jpg_photo(u8 *pname)
 	//printf("OV2640_OutSize_Set_RetValue: %d\r\n",res);
 	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
 	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置  
-  
+  printf("Jpeg Data as follows :\r\n");
 	while(1){
 		DCMI_Start(); 			//启动传输 
 		/*while(jpeg_data_ok!=1);	//等待第一帧图片采集完
 		jpeg_data_ok=2;			//忽略本帧图片,启动下一帧采集 
 		while(jpeg_data_ok!=1);	//等待第二帧图片采集完,第二帧,才保存到SD卡去.
 		*/
-		while(jpeg_data_ok!=1)
+		while(jpeg_data_ok!=1);
+					
+		//发送jpeg_data_buf中的数据
+			for(i=0;i<jpeg_data_len;i++)
+				printf("%x",jpeg_data_buf[i]);
+			printf("\r\n-----------------------------------------------\r\n");
 			jpeg_data_ok =2 ;
 		DCMI_Stop(); 			//停止DMA搬运
+		break;
 	}
+	return 0;
 	//ovx_mode=0; 
 	//sw_sdcard_mode();		//切换为SD卡模式
 	//res=f_open(f_jpg,(const TCHAR*)pname,FA_WRITE|FA_CREATE_NEW);//模式0,或者尝试打开失败,则创建新文件	 
@@ -215,7 +224,7 @@ void BLUELEDToggle(){
 }
 
 void REDLEDToggle(){
-	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_14);
+	//HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_14);
 }
 
 void LEDtest(){
@@ -233,7 +242,7 @@ void OV2640_PCLK(){
 }
 int main(void)
 {			
-  u8 ov2640ret ;	
+//  u8 ov2640ret ;	
 	u8 *pname ;					//带路径的文件名 
 	dcmi_line_buf[0] = JpegBuffer0;
 	dcmi_line_buf[1] = JpegBuffer1;
@@ -243,13 +252,14 @@ int main(void)
   HAL_Init();				        //初始化HAL库
   SystemClock_Config();   //设置时钟,168Mhz 
   delay_init(168);                //延时初始化
-	//uart1_init(115200);		        //串口1初始化，逻辑判断暂时不需要串口
+	uart1_init(115200);		        //串口1初始化，逻辑判断暂时不需要串口
 	BLUELEDinit();
-	REDLEDinit();
+	//REDLEDinit();
 	//LEDtest();
 	//printf("usart init over\r\n");
   //send a character to know the status
   while(OV2640_Init()!=0);				    //初始化OV2640
+	printf("ov2640 init over\r\n");
 	BLUELEDToggle();
 	HAL_Delay(500);
 	BLUELEDToggle();
