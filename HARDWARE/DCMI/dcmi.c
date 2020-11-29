@@ -35,10 +35,16 @@ void DCMI_Init(void)
     DCMI_Handler.Init.VSPolarity=DCMI_VSPOLARITY_LOW;       //VSYNC 低电平有效
     DCMI_Handler.Init.HSPolarity=DCMI_HSPOLARITY_LOW;       //HSYNC 低电平有效
     DCMI_Handler.Init.CaptureRate=DCMI_CR_ALL_FRAME;        //全帧捕获
+
+		//sxf
+		//DCMI_Handler.Init.DCMI_CaptureMode = DCMI_MODE_SNAPSHOT     //单帧捕获，看看速度
+		
+	
     DCMI_Handler.Init.ExtendedDataMode=DCMI_EXTEND_DATA_8B; //8位数据格式 
     DCMI_Handler.Init.JPEGMode = DCMI_JPEG_ENABLE;          //sxf-> 使能DCMI的JPEG格式
     HAL_DCMI_Init(&DCMI_Handler);                           //初始化DCMI 
     
+		DCMI_Handler.Instance->CR |= (uint32_t)DCMI_MODE_SNAPSHOT;
      //关闭行中断、VSYNC中断、同步错误中断和溢出中断
     __HAL_DCMI_DISABLE_IT(&DCMI_Handler,DCMI_IT_LINE|DCMI_IT_VSYNC|DCMI_IT_ERR|DCMI_IT_OVR);
     __HAL_DCMI_ENABLE_IT(&DCMI_Handler,DCMI_IT_FRAME);      //使能帧中断
@@ -50,6 +56,7 @@ void DCMI_Init(void)
 //hdcmi:DCMI句柄
 void HAL_DCMI_MspInit(DCMI_HandleTypeDef* hdcmi)
 {
+    
     GPIO_InitTypeDef GPIO_Initure;
     
     __HAL_RCC_DCMI_CLK_ENABLE();                //使能DCMI时钟

@@ -191,6 +191,8 @@ HAL_StatusTypeDef HAL_DCMI_Init(DCMI_HandleTypeDef *hdcmi)
                                      hdcmi->Init.JPEGMode | hdcmi->Init.ByteSelectMode |\
                                      hdcmi->Init.ByteSelectStart | hdcmi->Init.LineSelectMode |\
                                      hdcmi->Init.LineSelectStart);
+	//sxf modify
+	//hdcmi->Instance->CR |= (uint32_t)DCMI_MODE_SNAPSHOT;
                                      
   if(hdcmi->Init.SynchroMode == DCMI_SYNCHRO_EMBEDDED)
   {
