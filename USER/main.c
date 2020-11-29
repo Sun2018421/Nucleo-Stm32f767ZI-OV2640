@@ -64,7 +64,7 @@ void jpeg_data_process(void)
 	curline=yoffset;	//行数复位
 	if(ovx_mode&0X01)	//只有在JPEG格式下,才需要做处理.
 	{
-		printf("jpeg_data_ok is %d\r\n",jpeg_data_ok);
+	//	printf("jpeg_data_ok is %d\r\n",jpeg_data_ok);
 		if(jpeg_data_ok==0)	//jpeg数据还未采集完?
 		{
             __HAL_DMA_DISABLE(&DMADMCI_Handler);//关闭DMA
@@ -142,10 +142,11 @@ u8 ov2640_jpg_photo(u8 *pname)
 		while(jpeg_data_ok!=1);
 					
 		//发送jpeg_data_buf中的数据
-			for(i=0;i<jpeg_data_len;i++)
-				printf("%x",jpeg_data_buf[i]);
-			printf("\r\n-----------------------------------------------\r\n");
-			jpeg_data_ok =2 ;
+		printf("the size of JPEG is %d\r\n",jpeg_data_len);
+		for(i=0;i<jpeg_data_len;i++)
+			printf("%x",jpeg_data_buf[i]);
+		printf("\r\n-----------------------------------------------\r\n");
+		jpeg_data_ok =2 ;
 		DCMI_Stop(); 			//停止DMA搬运
 		break;
 	}

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [..\OBJ\CAMERA.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image ..\OBJ\CAMERA.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Sat Nov 28 18:28:10 2020
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Sat Nov 28 21:26:25 2020
 <BR><P>
 <H3>Maximum Stack Usage =        360 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -630,7 +630,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[6f]"></a>DCMI_IRQHandler</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, dcmi.o(i.DCMI_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = DCMI_IRQHandler &rArr; HAL_DCMI_IRQHandler &rArr; HAL_DCMI_FrameEventCallback &rArr; jpeg_data_process &rArr; __2printf
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = DCMI_IRQHandler &rArr; HAL_DCMI_IRQHandler &rArr; HAL_DCMI_FrameEventCallback &rArr; jpeg_data_process
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DCMI_IRQHandler
 </UL>
@@ -678,7 +678,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[aa]"></a>HAL_DCMI_FrameEventCallback</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, dcmi.o(i.HAL_DCMI_FrameEventCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = HAL_DCMI_FrameEventCallback &rArr; jpeg_data_process &rArr; __2printf
+<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = HAL_DCMI_FrameEventCallback &rArr; jpeg_data_process
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;jpeg_data_process
 </UL>
@@ -686,7 +686,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[a7]"></a>HAL_DCMI_IRQHandler</STRONG> (Thumb, 168 bytes, Stack size 24 bytes, stm32f7xx_hal_dcmi.o(i.HAL_DCMI_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = HAL_DCMI_IRQHandler &rArr; HAL_DCMI_FrameEventCallback &rArr; jpeg_data_process &rArr; __2printf
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = HAL_DCMI_IRQHandler &rArr; HAL_DCMI_FrameEventCallback &rArr; jpeg_data_process
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DCMI_VsyncEventCallback
 <LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DCMI_LineEventCallback
@@ -1317,7 +1317,6 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OV2640_Init
 <LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ov2640_jpg_photo
 <LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;jpeg_data_process
 <LI><a href="#[f2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmart_sys_cmd_exe
 <LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmart_scan
 <LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;usmart_exe
@@ -1359,11 +1358,10 @@ Global Symbols
 <P><STRONG><a name="[92]"></a>fputc</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, usart.o(i.fputc))
 <BR>[Address Reference Count : 1]<UL><LI> printf8.o(i.__0printf$8)
 </UL>
-<P><STRONG><a name="[ab]"></a>jpeg_data_process</STRONG> (Thumb, 238 bytes, Stack size 16 bytes, main.o(i.jpeg_data_process))
-<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = jpeg_data_process &rArr; __2printf
+<P><STRONG><a name="[ab]"></a>jpeg_data_process</STRONG> (Thumb, 246 bytes, Stack size 16 bytes, main.o(i.jpeg_data_process))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = jpeg_data_process
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_TogglePin
-<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DCMI_FrameEventCallback
 </UL>
@@ -1376,7 +1374,7 @@ Global Symbols
 <BR>[Address Reference Count : 2]<UL><LI> main.o(i.main)
 <LI> main.o(i.ov2640_jpg_photo)
 </UL>
-<P><STRONG><a name="[8d]"></a>main</STRONG> (Thumb, 304 bytes, Stack size 48 bytes, main.o(i.main))
+<P><STRONG><a name="[8d]"></a>main</STRONG> (Thumb, 312 bytes, Stack size 48 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 336<LI>Call Chain = main &rArr; SystemClock_Config &rArr; HAL_RCC_ClockConfig &rArr; HAL_InitTick &rArr; HAL_NVIC_SetPriority
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart1_init
@@ -1404,7 +1402,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL>
-<P><STRONG><a name="[eb]"></a>ov2640_jpg_photo</STRONG> (Thumb, 130 bytes, Stack size 16 bytes, main.o(i.ov2640_jpg_photo), UNUSED)
+<P><STRONG><a name="[eb]"></a>ov2640_jpg_photo</STRONG> (Thumb, 138 bytes, Stack size 16 bytes, main.o(i.ov2640_jpg_photo), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OV2640_OutSize_Set
 <LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OV2640_JPEG_Mode
 <LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OV2640_ImageWin_Set
