@@ -38,7 +38,7 @@ u16 curline=0;							//摄像头输出数据,当前行编号
 u16 yoffset=0;							//y方向的偏移量
 
 #define jpeg_buf_size   48*1024		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->48K
-#define jpeg_line_size	2*1024			//定义DMA接收数据时,一行数据的最大值->2K
+#define jpeg_line_size	1*1024			//定义DMA接收数据时,一行数据的最大值->2K
 
 u32 *dcmi_line_buf[2];					//RGB屏时,摄像头采用一行一行读取,定义行缓存  
 u32 *jpeg_data_buf;						//JPEG数据缓存buf 
@@ -79,7 +79,7 @@ void jpeg_data_process(void)
 		}
 		if(jpeg_data_ok==2)	//上一次的jpeg数据已经被处理了
 		{
-      __HAL_DMA_SET_COUNTER(&DMADMCI_Handler,jpeg_line_size);	//传输长度为jpeg_buf_size*4字节
+      __HAL_DMA_SET_COUNTER(&DMADMCI_Handler,jpeg_line_size/4);	//传输长度为jpeg_buf_size*4字节
 			__HAL_DMA_ENABLE(&DMADMCI_Handler); //打开DMA
 			jpeg_data_ok=0;					//标记数据未采集
 			jpeg_data_len=0;				//数据重新开始
@@ -92,7 +92,7 @@ void jpeg_data_process(void)
 //jpeg数据接收回调函数
 void jpeg_dcmi_rx_callback(void)
 {  	
-	u16 i;
+	u16 i; 
 	u32 *pbuf;
 	REDLEDToggle();
 	pbuf=jpeg_data_buf+jpeg_data_len;//偏移到有效数据末尾
@@ -135,7 +135,7 @@ u8 ov2640_jpg_photo(u8 *pname)
 	OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
 	//printf("OV2640_OutSize_Set_RetValue: %d\r\n",res);
 	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
-	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置  
+	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size/4,2,1);//DCMI DMA配置  
   printf("Jpeg Data as follows :\r\n");
 	while(1){
 		DCMI_Start(); 			//启动传输 
