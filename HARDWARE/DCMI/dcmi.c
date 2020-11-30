@@ -44,7 +44,7 @@ void DCMI_Init(void)
     DCMI_Handler.Init.JPEGMode = DCMI_JPEG_ENABLE;          //sxf-> 使能DCMI的JPEG格式
     HAL_DCMI_Init(&DCMI_Handler);                           //初始化DCMI 
     
-		DCMI_Handler.Instance->CR |= (uint32_t)DCMI_MODE_SNAPSHOT;
+		DCMI_Handler.Instance->CR |= (uint32_t)DCMI_MODE_SNAPSHOT; //sxf：设置单帧模式
      //关闭行中断、VSYNC中断、同步错误中断和溢出中断
     __HAL_DCMI_DISABLE_IT(&DCMI_Handler,DCMI_IT_LINE|DCMI_IT_VSYNC|DCMI_IT_ERR|DCMI_IT_OVR);
     __HAL_DCMI_ENABLE_IT(&DCMI_Handler,DCMI_IT_FRAME);      //使能帧中断

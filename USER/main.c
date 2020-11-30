@@ -67,8 +67,8 @@ void jpeg_data_process(void)
 		printf("jpeg_data_ok is %d\r\n",jpeg_data_ok);
 		if(jpeg_data_ok==0)	//jpeg数据还未采集完?
 		{
-            __HAL_DMA_DISABLE(&DMADMCI_Handler);//关闭DMA
-            while(DMA2_Stream1->CR&0X01);	//等待DMA2_Stream1可配置 
+      __HAL_DMA_DISABLE(&DMADMCI_Handler);//关闭DMA
+      while(DMA2_Stream1->CR&0X01);	//等待DMA2_Stream1可配置 
 			rlen=jpeg_line_size-__HAL_DMA_GET_COUNTER(&DMADMCI_Handler);//得到剩余数据长度	
 			pbuf=jpeg_data_buf+jpeg_data_len;//偏移到有效数据末尾,继续添加
 			if(DMADMCI_Handler.Instance->CR&(1<<19))for(i=0;i<rlen;i++)pbuf[i]=dcmi_line_buf[1][i];//读取buf1里面的剩余数据
@@ -79,7 +79,7 @@ void jpeg_data_process(void)
 		}
 		if(jpeg_data_ok==2)	//上一次的jpeg数据已经被处理了
 		{
-            __HAL_DMA_SET_COUNTER(&DMADMCI_Handler,jpeg_line_size);	//传输长度为jpeg_buf_size*4字节
+      __HAL_DMA_SET_COUNTER(&DMADMCI_Handler,jpeg_line_size);	//传输长度为jpeg_buf_size*4字节
 			__HAL_DMA_ENABLE(&DMADMCI_Handler); //打开DMA
 			jpeg_data_ok=0;					//标记数据未采集
 			jpeg_data_len=0;				//数据重新开始
@@ -115,9 +115,11 @@ void jpeg_dcmi_rx_callback(void)
 u8 ov2640_jpg_photo(u8 *pname)
 {
 	//FIL* f_jpg; 
-	u8 res=0,headok=0;
-	u32 bwr;
-	u32 i,jpgstart,jpglen;
+//	,headok=0;
+	//u8 res=0;
+	u32 i ;
+//	u32 bwr;
+//	u32 i,jpgstart,jpglen;
 	u8* pbuf;
 	//todo: 更新DMA以及文件缓冲大小，输出
 	//f_jpg=(FIL *)mymalloc(SRAMIN,sizeof(FIL));	//开辟FIL字节的内存区域 
@@ -126,9 +128,11 @@ u8 ov2640_jpg_photo(u8 *pname)
 	jpeg_data_ok=0;
 	//sw_ov2640_mode();						//切换为OV2640模式 
 	OV2640_JPEG_Mode();						//JPEG模式  
-	res = OV2640_ImageWin_Set(0,0,1600,1200);
+	//res = 
+	OV2640_ImageWin_Set(0,0,1600,1200);
 	//printf("OV2640_ImageWin_Set_RetValue: %d\r\n",res);
-	res = OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
+	//res = 
+	OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
 	//printf("OV2640_OutSize_Set_RetValue: %d\r\n",res);
 	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
 	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置  
@@ -143,8 +147,9 @@ u8 ov2640_jpg_photo(u8 *pname)
 					
 		//发送jpeg_data_buf中的数据
 		printf("the size of JPEG is %d\r\n",jpeg_data_len);
-		for(i=0;i<jpeg_data_len;i++)
-			printf("%x",jpeg_data_buf[i]);
+		pbuf=(u8*)jpeg_data_buf;
+		for(i=0;i<jpeg_data_len*4;i++)
+			printf("%x",pbuf[i]);
 		printf("\r\n-----------------------------------------------\r\n");
 		jpeg_data_ok =2 ;
 		DCMI_Stop(); 			//停止DMA搬运
@@ -154,48 +159,48 @@ u8 ov2640_jpg_photo(u8 *pname)
 	//ovx_mode=0; 
 	//sw_sdcard_mode();		//切换为SD卡模式
 	//res=f_open(f_jpg,(const TCHAR*)pname,FA_WRITE|FA_CREATE_NEW);//模式0,或者尝试打开失败,则创建新文件	 
-	if(res==0)
-	{
-		//printf("jpeg data size:%d\r\n",jpeg_data_len*4);//串口打印JPEG文件大小
-		pbuf=(u8*)jpeg_data_buf;
-		jpglen=0;	//设置jpg文件大小为0
-		headok=0;	//清除jpg头标记
-		for(i=0;i<jpeg_data_len*4;i++)//查找0XFF,0XD8和0XFF,0XD9,获取jpg文件大小
-		{
-			if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD8))//找到FF D8
-			{
-				jpgstart=i;
-				headok=1;	//标记找到jpg头(FF D8)
-			}
-			if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD9)&&headok)//找到头以后,再找FF D9
-			{
-				jpglen=i-jpgstart+2;
-				break;
-			}
-		}
-		if(jpglen)			//正常的jpeg数据 
-		{
-			pbuf+=jpgstart;	//偏移到0XFF,0XD8处
-			//res=f_write(f_jpg,pbuf,jpglen,&bwr);
-			if(bwr!=jpglen)res=0XFE; 
-			//printf("get useful jpeg and the res = %x\r\n",res);
-		}else res=0XFD; 
-	}
-	jpeg_data_len=0;
-	//f_close(f_jpg); 
-	//sw_ov2640_mode();		//切换为OV2640模式
-	//OV2640_RGB565_Mode();	//RGB565模式  
- /*	dcmi_rx_callback = handle_dcmi_callback;
-	if(lcdltdc.pwidth!=0)	//RGB屏
-	{
-		dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
-		DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],lcddev.width/2,1,1);//DCMI DMA配置  
-	}else					//MCU 屏
-	{
-		DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,1,0);			//DCMI DMA配置,MCU屏,竖屏
-	}
-	myfree(SRAMIN,f_jpg); */
-	return res;
+//	if(res==0)
+//	{
+//		//printf("jpeg data size:%d\r\n",jpeg_data_len*4);//串口打印JPEG文件大小
+//		pbuf=(u8*)jpeg_data_buf;
+//		jpglen=0;	//设置jpg文件大小为0
+//		headok=0;	//清除jpg头标记
+//		for(i=0;i<jpeg_data_len*4;i++)//查找0XFF,0XD8和0XFF,0XD9,获取jpg文件大小
+//		{
+//			if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD8))//找到FF D8
+//			{
+//				jpgstart=i;
+//				headok=1;	//标记找到jpg头(FF D8)
+//			}
+//			if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD9)&&headok)//找到头以后,再找FF D9
+//			{
+//				jpglen=i-jpgstart+2;
+//				break;
+//			}
+//		}
+//		if(jpglen)			//正常的jpeg数据 
+//		{
+//			pbuf+=jpgstart;	//偏移到0XFF,0XD8处
+//			//res=f_write(f_jpg,pbuf,jpglen,&bwr);
+//			if(bwr!=jpglen)res=0XFE; 
+//			//printf("get useful jpeg and the res = %x\r\n",res);
+//		}else res=0XFD; 
+//	}
+//	jpeg_data_len=0;
+//	//f_close(f_jpg); 
+//	//sw_ov2640_mode();		//切换为OV2640模式
+//	//OV2640_RGB565_Mode();	//RGB565模式  
+// /*	dcmi_rx_callback = handle_dcmi_callback;
+//	if(lcdltdc.pwidth!=0)	//RGB屏
+//	{
+//		dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
+//		DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],lcddev.width/2,1,1);//DCMI DMA配置  
+//	}else					//MCU 屏
+//	{
+//		DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,1,0);			//DCMI DMA配置,MCU屏,竖屏
+//	}
+//	myfree(SRAMIN,f_jpg); */
+//	return res;
 }  
 
 void BLUELEDinit(){
