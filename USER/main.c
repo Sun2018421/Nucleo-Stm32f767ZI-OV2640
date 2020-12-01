@@ -156,51 +156,6 @@ u8 ov2640_jpg_photo(u8 *pname)
 		break;
 	}
 	return 0;
-	//ovx_mode=0; 
-	//sw_sdcard_mode();		//切换为SD卡模式
-	//res=f_open(f_jpg,(const TCHAR*)pname,FA_WRITE|FA_CREATE_NEW);//模式0,或者尝试打开失败,则创建新文件	 
-//	if(res==0)
-//	{
-//		//printf("jpeg data size:%d\r\n",jpeg_data_len*4);//串口打印JPEG文件大小
-//		pbuf=(u8*)jpeg_data_buf;
-//		jpglen=0;	//设置jpg文件大小为0
-//		headok=0;	//清除jpg头标记
-//		for(i=0;i<jpeg_data_len*4;i++)//查找0XFF,0XD8和0XFF,0XD9,获取jpg文件大小
-//		{
-//			if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD8))//找到FF D8
-//			{
-//				jpgstart=i;
-//				headok=1;	//标记找到jpg头(FF D8)
-//			}
-//			if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD9)&&headok)//找到头以后,再找FF D9
-//			{
-//				jpglen=i-jpgstart+2;
-//				break;
-//			}
-//		}
-//		if(jpglen)			//正常的jpeg数据 
-//		{
-//			pbuf+=jpgstart;	//偏移到0XFF,0XD8处
-//			//res=f_write(f_jpg,pbuf,jpglen,&bwr);
-//			if(bwr!=jpglen)res=0XFE; 
-//			//printf("get useful jpeg and the res = %x\r\n",res);
-//		}else res=0XFD; 
-//	}
-//	jpeg_data_len=0;
-//	//f_close(f_jpg); 
-//	//sw_ov2640_mode();		//切换为OV2640模式
-//	//OV2640_RGB565_Mode();	//RGB565模式  
-// /*	dcmi_rx_callback = handle_dcmi_callback;
-//	if(lcdltdc.pwidth!=0)	//RGB屏
-//	{
-//		dcmi_rx_callback=rgblcd_dcmi_rx_callback;//RGB屏接收数据回调函数
-//		DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],lcddev.width/2,1,1);//DCMI DMA配置  
-//	}else					//MCU 屏
-//	{
-//		DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,1,0);			//DCMI DMA配置,MCU屏,竖屏
-//	}
-//	myfree(SRAMIN,f_jpg); */
-//	return res;
 }  
 
 void BLUELEDinit(){
