@@ -13,8 +13,8 @@ u8 ovx_mode=1;							//bit0:0,RGB565模式;1,JPEG模式
 u16 curline=0;							//摄像头输出数据,当前行编号
 u16 yoffset=0;							//y方向的偏移量
 
-#define jpeg_buf_size   48*1024/4		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->48K
-#define jpeg_line_size	2*1024/4			//定义DMA接收数据时,一行数据的最大值->2KB
+#define jpeg_buf_size   12*1024/4		//定义JPEG数据缓存jpeg_buf的大小(4M字节)->12K
+#define jpeg_line_size	400/4			//定义DMA接收数据时,一行数据的最大值->2KB
 
 u32 *dcmi_line_buf[2];					//RGB屏时,摄像头采用一行一行读取,定义行缓存  
 u32 *jpeg_data_buf;						//JPEG数据缓存buf 
@@ -25,7 +25,7 @@ volatile u8 jpeg_data_ok=0;				//JPEG数据采集完成标志
 										//1,数据采集完了,但是还没处理;
 										//2,数据已经处理完成了,可以开始下一帧接
 uint32_t JpegBuffer0[jpeg_line_size];  //2k的jpeg的缓冲内存0
-uint32_t JpegBuffer1[jpeg_line_size];  //2k的jpeg的缓冲内存1
+//uint32_t JpegBuffer1[jpeg_line_size];  //2k的jpeg的缓冲内存1
 uint32_t JpegBuf[jpeg_buf_size];
 void REDLEDToggle(void);
 void BLUELEDToggle(void);
@@ -36,56 +36,44 @@ void jpeg_data_process(void)
 	u16 i;
 	u16 rlen;			//剩余数据长度
 	u32 *pbuf;
-	BLUELEDToggle();
-	curline=yoffset;	//行数复位
-	if(ovx_mode&0X01)	//只有在JPEG格式下,才需要做处理.
-	{
-		printf("\r\njpeg_data_ok is %d\r\n",jpeg_data_ok);
-		if(jpeg_data_ok==0)	//jpeg数据还未采集完?
-		{
-      __HAL_DMA_DISABLE(&DMADMCI_Handler);//关闭DMA
-      while(DMA2_Stream1->CR&0X01);	//等待DMA2_Stream1可配置 
-			rlen=(jpeg_line_size-__HAL_DMA_GET_COUNTER(&DMADMCI_Handler));//得到剩余数据长度	
-			pbuf=jpeg_data_buf+jpeg_data_len;//偏移到有效数据末尾,继续添加
-			if(DMADMCI_Handler.Instance->CR&(1<<19))
-			{		
-				for(i=0;i<rlen;i++){
-					pbuf[i]=dcmi_line_buf[1][i];//读取buf1里面的剩余数据
-					printf("%x",pbuf[i]);
-				}
-			}
-			else 
-			{
-				for(i=0;i<rlen;i++){
-					pbuf[i]=dcmi_line_buf[0][i];//读取buf0里面的剩余数据 
-					printf("%x",pbuf[i]);
-				}
-			}
-			jpeg_data_len+=rlen;			//加上剩余长度
-			printf("\r\nVSdata\r\n");
+	//printf("\r\nVSYNC\r\n");
+//	DCMI_Start();
+//      __HAL_DMA_DISABLE(&DMADMCI_Handler);//关闭DMA
+//      while(DMA2_Stream1->CR&0X01);	//等待DMA2_Stream1可配置 
+//			rlen=(jpeg_line_size-__HAL_DMA_GET_COUNTER(&DMADMCI_Handler));//得到剩余数据长度	
+//			printf("\r\nrlen = %d\r\n",rlen);
+			//单缓冲测试
+			//	pbuf=jpeg_data_buf+jpeg_data_len;//偏移到有效数据末尾,继续添加
+//			if(DMADMCI_Handler.Instance->CR&(1<<19))
+//			{		
+//				for(i=0;i<rlen;i++){
+//					pbuf[i]=dcmi_line_buf[0][i];//读取buf1里面的剩余数据
+//					printf("%x",pbuf[i]);
+//				}
+//			}
+//			else 
+//			{
+//				for(i=0;i<rlen;i++){
+//					pbuf[i]=dcmi_line_buf[0][i];//读取buf0里面的剩余数据 
+//					printf("%x",pbuf[i]);
+//				}
+//			}
+//			jpeg_data_len+=rlen;			//加上剩余长度
+//			printf("\r\nVSdata\r\n");
+      REDLEDToggle();
 			jpeg_data_ok=1; 				//标记JPEG数据采集完按成,等待其他函数处理
-		}
-		if(jpeg_data_ok==2)	//上一次的jpeg数据已经被处理了
-		{
-      __HAL_DMA_SET_COUNTER(&DMADMCI_Handler,jpeg_line_size/4);	//传输长度为jpeg_buf_size*4字节
-			__HAL_DMA_ENABLE(&DMADMCI_Handler); //打开DMA
-			jpeg_data_ok=0;					//标记数据未采集
-			jpeg_data_len=0;				//数据重新开始
-		}
-	}else
-	{  
-	}  
 }
 
 //jpeg数据接收回调函数
 void jpeg_dcmi_rx_callback(void)
-{  	
-	u16 i; 
-	u32 *pbuf;
-	u32 size = jpeg_line_size;
-	REDLEDToggle();
-	pbuf=jpeg_data_buf+jpeg_data_len;//偏移到有效数据末尾
-  //  printf("jpeg_dcmi_rx_callback,data_len=%d\r\n",jpeg_data_len);
+{
+//	u16 i; 
+//	u32 *pbuf;
+//	u32 size = jpeg_line_size;
+//	//REDLEDToggle();
+//	pbuf=jpeg_data_buf;//偏移到有效数据末尾
+	/*
+	//  printf("jpeg_dcmi_rx_callback,data_len=%d\r\n",jpeg_data_len);
 	if(DMADMCI_Handler.Instance->CR&(1<<19))//buf0已满,正常处理buf1
 	{ 
 		printf("\r\n---------buf0-----------\r\n");
@@ -107,12 +95,61 @@ void jpeg_dcmi_rx_callback(void)
 	} 
 		//DMADMCI_Handler.Instance->CR = DMADMCI_Handler.Instance->CR ^(1<<19);
     SCB_CleanInvalidateDCache();        //清除无效化DCache
+		*/
+		//单缓冲下
+//		for(i=0;i<size;i++){
+//			pbuf[i]=dcmi_line_buf[0][i];//读取buf0里面的数据
+//			printf("%x",pbuf[i]);
+//		}
+//    __HAL_DMA_SET_COUNTER(&DMADMCI_Handler,jpeg_line_size);	//传输长度为jpeg_buf_size*4字节
+//		__HAL_DMA_ENABLE(&DMADMCI_Handler); //打开DMA
+//		jpeg_data_len=1;				
+	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_7);
 }
+
+void RGB_dcmi_rx_callback(void){
+	u16 i; 
+	u32 *pbuf;
+	u32 size = jpeg_line_size;
+	pbuf=jpeg_data_buf;//偏移到有效数据末尾
+	/*
+	//  printf("jpeg_dcmi_rx_callback,data_len=%d\r\n",jpeg_data_len);
+	if(DMADMCI_Handler.Instance->CR&(1<<19))//buf0已满,正常处理buf1
+	{ 
+		printf("\r\n---------buf0-----------\r\n");
+		for(i=0;i<size;i++){
+			pbuf[i]=dcmi_line_buf[0][i];//读取buf0里面的数据
+			printf("%x",pbuf[i]);
+		}	
+		jpeg_data_len+=jpeg_line_size;//偏移
+	}
+	else //buf1已满,正常处理buf0
+	{	
+		printf("\r\n---------buf1-----------\r\n");
+		for(i=0;i<size;i++){
+			pbuf[i]=dcmi_line_buf[1][i];//读取buf1里面的数据
+			printf("%x",pbuf[i]);
+		}
+		jpeg_data_len+=jpeg_line_size;//偏移 
+	} 
+		//DMADMCI_Handler.Instance->CR = DMADMCI_Handler.Instance->CR ^(1<<19);
+    SCB_CleanInvalidateDCache();        //清除无效化DCache
+		*/
+		//单缓冲下
+		for(i=0;i<size;i++){
+			pbuf[i]=dcmi_line_buf[0][i];//读取buf0里面的数据
+			printf("%x",pbuf[i]);
+		}
+		printf("\r\n");
+    __HAL_DMA_SET_COUNTER(&DMADMCI_Handler,jpeg_line_size);	//传输长度为jpeg_buf_size*4字节
+		__HAL_DMA_ENABLE(&DMADMCI_Handler); //打开DMA
+		jpeg_data_len=1;		
+}	
 
 //OV5640拍照jpg图片
 //返回值:0,成功
 //    其他,错误代码
-u8 ov2640_jpg_photo(u8 *pname)
+u8 ov2640_jpg_photo()
 {
 	u32 i ;
 	u32* pbuf;
@@ -126,15 +163,18 @@ u8 ov2640_jpg_photo(u8 *pname)
 	OV2640_ImageWin_Set(0,0,1600,1200);
 	OV2640_OutSize_Set(1600,1200);          //拍照尺寸为1600*1200
 	dcmi_rx_callback=jpeg_dcmi_rx_callback;	//JPEG接收数据回调函数
-	DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置  
-  printf("Jpeg Data as follows :\r\n");
+	//DCMI_DMA_Init((u32)dcmi_line_buf[0],(u32)dcmi_line_buf[1],jpeg_line_size,2,1);//DCMI DMA配置  
+	DCMI_DMA_Init((u32)dcmi_line_buf[0],0,jpeg_line_size,2,1);
+ // printf("Jpeg Data as follows :");
 	while(1){
-		DCMI_Start(); 			//启动传输 
+	jpeg_data_ok=0;
+	DCMI_DMA_Init((u32)dcmi_line_buf[0],0,jpeg_line_size,2,1);
+	DCMI_Start(); 			//启动传输 
 		/*while(jpeg_data_ok!=1);	//等待第一帧图片采集完
 		jpeg_data_ok=2;			//忽略本帧图片,启动下一帧采集 
 		while(jpeg_data_ok!=1);	//等待第二帧图片采集完,第二帧,才保存到SD卡去.
 		*/
-		while(jpeg_data_ok!=1);
+	while(jpeg_data_ok!=1);
 					
 		//发送jpeg_data_buf中的数据
 //		printf("the size of JPEG is %d\r\n",jpeg_data_len);
@@ -143,11 +183,19 @@ u8 ov2640_jpg_photo(u8 *pname)
 //			printf("%x",pbuf[i]);
 //		printf("\r\n-----------------------------------------------\r\n");
 //		jpeg_data_ok =2 ;
-//		DCMI_Stop(); 			//停止DMA搬运
-		break;
+		DCMI_Stop(); 			//停止DMA搬运
+//		break;
 	}
 	return 0;
 }  
+
+u8 ov2640_RGB_photo(){
+	dcmi_rx_callback = RGB_dcmi_rx_callback;
+	DCMI_Start();
+	while(jpeg_data_ok!=1);
+	DCMI_Stop();
+	return 0;
+}
 
 void BLUELEDinit(){
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -176,7 +224,7 @@ void BLUELEDToggle(){
 }
 
 void REDLEDToggle(){
-	//HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_14);
+	HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_14);
 }
 
 void LEDtest(){
@@ -194,24 +242,19 @@ void OV2640_PCLK(){
 }
 int main(void)
 {			
-//  u8 ov2640ret ;	
-	u8 *pname ;					//带路径的文件名 
+	u8 type = 1 ;  //0->RGB,1->JPEG
 	dcmi_line_buf[0] = JpegBuffer0;
-	dcmi_line_buf[1] = JpegBuffer1;
 	jpeg_data_buf = JpegBuf;
   Write_Through();                //开启强制透写！
   Cache_Enable();                 //打开L1-Cache,和cubemx生成相同
   HAL_Init();				        //初始化HAL库
   SystemClock_Config();   //设置时钟,168Mhz 
   delay_init(168);                //延时初始化
-	uart1_init(115200);		        //串口1初始化，逻辑判断暂时不需要串口
+	//uart1_init(115200);		        //串口1初始化，逻辑判断暂时不需要串口
 	BLUELEDinit();
-	//REDLEDinit();
-	//LEDtest();
-	//printf("usart init over\r\n");
-  //send a character to know the status
+	REDLEDinit();
   while(OV2640_Init()!=0);				    //初始化OV2640
-	printf("ov2640 init over\r\n");
+	//printf("ov2640 init over\r\n");
 	BLUELEDToggle();
 	HAL_Delay(500);
 	BLUELEDToggle();
@@ -219,16 +262,17 @@ int main(void)
     //Show_Str(30,210,230,16,"OV2640 正常",16,0); 
 	//自动对焦初始化
 	OV2640_RGB565_Mode();	//RGB565模式,切换为JPEG格式
-	OV2640_JPEG_Mode();
 	OV2640_Light_Mode(0);	//自动模式
 	OV2640_Color_Saturation(3);//色彩饱和度0
 	OV2640_Brightness(4);	//亮度0
 	OV2640_Contrast(3);		//对比度0
 	
 	DCMI_Init();			//DCMI配置
-	ov2640_jpg_photo(pname);  //内部有DMA初始化
-
-
+	if(type == 1)
+		ov2640_jpg_photo();  //内部有DMA初始化
+	else 
+		ov2640_RGB_photo();
+	//printf("\r\nOver\r\n");
 }
 void HAL_MspInit(void)
 {

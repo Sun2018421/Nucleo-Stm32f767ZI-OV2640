@@ -138,10 +138,11 @@ void DCMI_DMA_Init(u32 mem0addr,u32 mem1addr,u16 memsize,u32 memblen,u32 meminc)
     else                //使用双缓冲
     {
         HAL_DMAEx_MultiBufferStart(&DMADMCI_Handler,(u32)&DCMI->DR,mem0addr,mem1addr,memsize);//开启双缓冲
-        __HAL_DMA_ENABLE_IT(&DMADMCI_Handler,DMA_IT_TC);    //开启传输完成中断
-        HAL_NVIC_SetPriority(DMA2_Stream1_IRQn,0,0);        //DMA中断优先级
-        HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+        
     }    
+		__HAL_DMA_ENABLE_IT(&DMADMCI_Handler,DMA_IT_TC);    //开启传输完成中断
+		HAL_NVIC_SetPriority(DMA2_Stream1_IRQn,0,0);        //DMA中断优先级
+    HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
 }
 
 //DCMI,启动传输
@@ -184,6 +185,7 @@ void (*dcmi_rx_callback)(void);//DCMI DMA接收回调函数
 //DMA2数据流1中断服务函数
 void DMA2_Stream1_IRQHandler(void)
 { 
+//	printf("\r\nDMA Interrupt\r\n");
 		//REDLEDToggle();
     if(__HAL_DMA_GET_FLAG(&DMADMCI_Handler,DMA_FLAG_TCIF1_5)!=RESET)//DMA传输完成
     {

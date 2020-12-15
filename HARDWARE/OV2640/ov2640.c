@@ -119,6 +119,14 @@ u8 OV2640_Init(void)
 	{
 	   	SCCB_WR_Reg(ov2640_sxga_init_reg_tbl[i][0],ov2640_sxga_init_reg_tbl[i][1]);
  	} 
+	for(i=0;i<sizeof(ov2640_sxga_init_reg_tbl)/2;i++)
+	{
+	   	SCCB_WR_Reg(ov2640_sxga_init_reg_tbl[i][0],ov2640_sxga_init_reg_tbl[i][1]);
+ 	} 
+	for(i=0;i<sizeof(ov2640_sxga_init_reg_tbl)/2;i++)
+	{
+	   	SCCB_WR_Reg(ov2640_sxga_init_reg_tbl[i][0],ov2640_sxga_init_reg_tbl[i][1]);
+ 	} 
   	return 0x00; 	//ok
 } 
 //OV2640切换为JPEG模式
@@ -130,8 +138,24 @@ void OV2640_JPEG_Mode(void)
 	{
 		SCCB_WR_Reg(ov2640_yuv422_reg_tbl[i][0],ov2640_yuv422_reg_tbl[i][1]); 
 	} 
+	for(i=0;i<(sizeof(ov2640_yuv422_reg_tbl)/2);i++)
+	{
+		SCCB_WR_Reg(ov2640_yuv422_reg_tbl[i][0],ov2640_yuv422_reg_tbl[i][1]); 
+	} 
+	for(i=0;i<(sizeof(ov2640_yuv422_reg_tbl)/2);i++)
+	{
+		SCCB_WR_Reg(ov2640_yuv422_reg_tbl[i][0],ov2640_yuv422_reg_tbl[i][1]); 
+	} 
 	
 	//设置:输出JPEG数据
+	for(i=0;i<(sizeof(ov2640_jpeg_reg_tbl)/2);i++)
+	{
+		SCCB_WR_Reg(ov2640_jpeg_reg_tbl[i][0],ov2640_jpeg_reg_tbl[i][1]);  
+	}  
+	for(i=0;i<(sizeof(ov2640_jpeg_reg_tbl)/2);i++)
+	{
+		SCCB_WR_Reg(ov2640_jpeg_reg_tbl[i][0],ov2640_jpeg_reg_tbl[i][1]);  
+	}  
 	for(i=0;i<(sizeof(ov2640_jpeg_reg_tbl)/2);i++)
 	{
 		SCCB_WR_Reg(ov2640_jpeg_reg_tbl[i][0],ov2640_jpeg_reg_tbl[i][1]);  
@@ -142,6 +166,14 @@ void OV2640_RGB565_Mode(void)
 {
 	u16 i=0;
 	//设置:RGB565输出
+	for(i=0;i<(sizeof(ov2640_rgb565_reg_tbl)/2);i++)
+	{
+		SCCB_WR_Reg(ov2640_rgb565_reg_tbl[i][0],ov2640_rgb565_reg_tbl[i][1]); 
+	} 
+	for(i=0;i<(sizeof(ov2640_rgb565_reg_tbl)/2);i++)
+	{
+		SCCB_WR_Reg(ov2640_rgb565_reg_tbl[i][0],ov2640_rgb565_reg_tbl[i][1]); 
+	} 
 	for(i=0;i<(sizeof(ov2640_rgb565_reg_tbl)/2);i++)
 	{
 		SCCB_WR_Reg(ov2640_rgb565_reg_tbl[i][0],ov2640_rgb565_reg_tbl[i][1]); 
