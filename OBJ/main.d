@@ -87,3 +87,5 @@
 ..\obj\main.o: ..\HARDWARE\DCMI\dcmi.h
 ..\obj\main.o: ..\USMART\usmart.h
 ..\obj\main.o: ..\USMART\usmart_str.h
+..\obj\main.o: ..\HARDWARE\TIMER\tim.h
+..\obj\main.o: ..\USER\main.h

@@ -8,6 +8,7 @@
 #include "ov2640.h"
 #include "dcmi.h"
 #include "usmart.h"
+#include "tim.h"
 vu8 bmp_request=0;						//bmp拍照请求:0,无bmp拍照请求;1,有bmp拍照请求,需要在帧中断里面,关闭DCMI接口.
 u8 ovx_mode=1;							//bit0:0,RGB565模式;1,JPEG模式 
 u16 curline=0;							//摄像头输出数据,当前行编号
@@ -249,30 +250,36 @@ int main(void)
   Cache_Enable();                 //打开L1-Cache,和cubemx生成相同
   HAL_Init();				        //初始化HAL库
   SystemClock_Config();   //设置时钟,168Mhz 
-  delay_init(168);                //延时初始化
+ // delay_init(168);                //延时初始化
 	//uart1_init(115200);		        //串口1初始化，逻辑判断暂时不需要串口
 	BLUELEDinit();
-	REDLEDinit();
-  while(OV2640_Init()!=0);				    //初始化OV2640
-	//printf("ov2640 init over\r\n");
-	BLUELEDToggle();
-	HAL_Delay(500);
-	BLUELEDToggle();
-	//printf("ov2640ret = %d\r\n",ov2640ret); //输出初始化OV2640后的返回值
-    //Show_Str(30,210,230,16,"OV2640 正常",16,0); 
-	//自动对焦初始化
-	OV2640_RGB565_Mode();	//RGB565模式,切换为JPEG格式
-	OV2640_Light_Mode(0);	//自动模式
-	OV2640_Color_Saturation(3);//色彩饱和度0
-	OV2640_Brightness(4);	//亮度0
-	OV2640_Contrast(3);		//对比度0
-	
-	DCMI_Init();			//DCMI配置
-	if(type == 1)
-		ov2640_jpg_photo();  //内部有DMA初始化
-	else 
-		ov2640_RGB_photo();
-	//printf("\r\nOver\r\n");
+	MX_TIM3_Init();
+	HAL_TIM_Base_Start_IT(&htim3);
+	//BLUELEDToggle();
+//	REDLEDinit();
+//
+//  while(OV2640_Init()!=0);				    //初始化OV2640
+//	//printf("ov2640 init over\r\n");
+//	BLUELEDToggle();
+//	HAL_Delay(500);
+//	BLUELEDToggle();
+//	//printf("ov2640ret = %d\r\n",ov2640ret); //输出初始化OV2640后的返回值
+//    //Show_Str(30,210,230,16,"OV2640 正常",16,0); 
+//	//自动对焦初始化
+//	OV2640_RGB565_Mode();	//RGB565模式,切换为JPEG格式
+//	OV2640_Light_Mode(0);	//自动模式
+//	OV2640_Color_Saturation(3);//色彩饱和度0
+//	OV2640_Brightness(4);	//亮度0
+//	OV2640_Contrast(3);		//对比度0
+//	
+//	DCMI_Init();			//DCMI配置
+//	if(type == 1)
+//		ov2640_jpg_photo();  //内部有DMA初始化
+//	else 
+//		ov2640_RGB_photo();
+//	//printf("\r\nOver\r\n");
+	while(1){
+	}
 }
 void HAL_MspInit(void)
 {
@@ -281,3 +288,11 @@ void HAL_MspInit(void)
   
 }
 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+//	     while(1){
+//		HAL_Delay(100);
+//		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_7);
+//	}
+//		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_7);
+}

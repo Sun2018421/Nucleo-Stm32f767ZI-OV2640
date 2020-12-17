@@ -347,10 +347,14 @@ HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *htim)
 {
   /* Check the parameters */
   assert_param(IS_TIM_INSTANCE(htim->Instance));
-  
+ 
   /* Enable the TIM Update interrupt */
   __HAL_TIM_ENABLE_IT(htim, TIM_IT_UPDATE);
-      
+	//	htim->Instance->DIER = 0x0001;
+       while(1){
+		HAL_Delay(100);
+		HAL_GPIO_TogglePin(GPIOB,GPIO_PIN_7);
+	}
   /* Enable the Peripheral */
   __HAL_TIM_ENABLE(htim);
       
